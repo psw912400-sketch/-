@@ -12,6 +12,10 @@
 //     → 특정 순위(1~10 PC, 1~5 MOBILE)에 필요한 예상 평균 입찰가 조회
 //   ?action=set-bid&keywordId=...&adgroupId=...&bidAmt=650
 //     → 키워드 입찰가 변경 (70~100000원, 실제로는 100~1000원 사이가 흔함)
+//   ?action=estimate-bulk&type=id&position=3&device=PC&keysB64=...
+//     → 최대 200개 키워드(id 또는 keyword 텍스트)의 순위별 예상 입찰가를 한 번에 조회
+//   ?action=set-bid-bulk&itemsB64=...
+//     → 최대 200개 키워드의 입찰가를 한 번에 변경 ([{nccKeywordId,bidAmt}] 배열을 base64)
 //   ?action=schedule&ownerId=...
 //     → 캠페인/광고그룹의 현재 요일·시간 타겟팅 설정 조회 (TIME_WEEKLY_TARGET)
 //   ?action=set-schedule&ownerId=...&days=MON,TUE,WED,THU,FRI&startHour=9&endHour=18
@@ -133,6 +137,65 @@ exports.handler = async (event) => {
           bidAmt,
           useGroupBidAmt: false,
         });
+        return json(200, result);
+      }
+
+      // 한 번에 최대 200개 키워드까지 순위별 예상 입찰가를 조회합니다 (네이버 API 자체 제한).
+      // ?action=estimate-bulk&type=id&position=3&device=PC&keysB64=(["nkw-...","nkw-..."]를 base64)
+      // type=id면 keysB64 안의 값은 nccKeywordId, type=keyword면 키워드 텍스트입니다.
+      case "estimate-bulk": {
+        if (!q.type || !q.position || !q.keysB64) {
+          return json(400, { error: "type(id|keyword), position, keysB64 파라미터가 필요합니다" });
+        }
+        if (!["id", "keyword"].includes(q.type)) {
+          return json(400, { error: "type은 id 또는 keyword여야 합니다" });
+        }
+        let keys;
+        try {
+          keys = JSON.parse(Buffer.from(q.keysB64, "base64").toString("utf8"));
+        } catch (e) {
+          return json(400, { error: "keysB64 디코딩 실패: " + String(e.message || e) });
+        }
+        if (!Array.isArray(keys) || !keys.length) {
+          return json(400, { error: "keysB64는 비어있지 않은 배열이어야 합니다" });
+        }
+        if (keys.length > 200) {
+          return json(400, { error: "한 번에 최대 200개까지만 가능합니다 (네이버 API 제한)" });
+        }
+        const device = (q.device || "PC").toUpperCase();
+        const position = Number(q.position);
+        const items = keys.map((k) => ({ key: k, position }));
+        const result = await request("POST", `/estimate/average-position-bid/${q.type}`, { device, items });
+        return json(200, result);
+      }
+
+      // 한 번에 최대 200개 키워드까지 입찰가를 일괄 변경합니다 (네이버 API 자체 제한).
+      // ?action=set-bid-bulk&itemsB64=([{"nccKeywordId":"nkw-...","bidAmt":650}, ...]를 base64)
+      case "set-bid-bulk": {
+        if (!q.itemsB64) return json(400, { error: "itemsB64 파라미터가 필요합니다" });
+        let items;
+        try {
+          items = JSON.parse(Buffer.from(q.itemsB64, "base64").toString("utf8"));
+        } catch (e) {
+          return json(400, { error: "itemsB64 디코딩 실패: " + String(e.message || e) });
+        }
+        if (!Array.isArray(items) || !items.length) {
+          return json(400, { error: "itemsB64는 비어있지 않은 배열이어야 합니다" });
+        }
+        if (items.length > 200) {
+          return json(400, { error: "한 번에 최대 200개까지만 가능합니다 (네이버 API 제한)" });
+        }
+        const body = [];
+        for (const it of items) {
+          if (!it.nccKeywordId || typeof it.bidAmt !== "number") {
+            return json(400, { error: "각 항목은 nccKeywordId, bidAmt(숫자)가 필요합니다" });
+          }
+          if (it.bidAmt < 70 || it.bidAmt > 100000) {
+            return json(400, { error: `bidAmt는 70~100000 사이여야 합니다: ${it.nccKeywordId}=${it.bidAmt}` });
+          }
+          body.push({ nccKeywordId: it.nccKeywordId, bidAmt: it.bidAmt, useGroupBidAmt: false });
+        }
+        const result = await request("PUT", "/ncc/keywords?fields=bidAmt", body);
         return json(200, result);
       }
 
@@ -272,6 +335,8 @@ exports.handler = async (event) => {
             "schedule",
             "set-schedule",
             "adgroup-targets",
+            "estimate-bulk",
+            "set-bid-bulk",
           ],
         });
     }
