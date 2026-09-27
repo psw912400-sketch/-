@@ -115,6 +115,20 @@ exports.handler = async (event) => {
         return json(200, result);
       }
 
+      case "stats": {
+        if (!q.ids) return json(400, { error: "ids 파라미터가 필요합니다 (콤마로 구분된 캠페인/그룹/키워드 ID)" });
+        const fields = q.fields || "impCnt,clkCnt,ctr,avgRnk,salesAmt";
+        const fieldsArr = fields.split(",").map((f) => f.trim());
+        const datePreset = q.datePreset || "last30days";
+        const idsArr = JSON.stringify(q.ids.split(",").map((s) => s.trim()));
+        const fieldsJson = JSON.stringify(fieldsArr);
+        const uri = `/stats?ids=${encodeURIComponent(idsArr)}&fields=${encodeURIComponent(
+          fieldsJson
+        )}&datePreset=${encodeURIComponent(datePreset)}`;
+        const result = await request("GET", uri);
+        return json(200, result);
+      }
+
       case "schedule": {
         if (!q.ownerId) return json(400, { error: "ownerId 파라미터가 필요합니다 (캠페인 또는 광고그룹 ID)" });
         const list = await request(
@@ -162,7 +176,16 @@ exports.handler = async (event) => {
       default:
         return json(400, {
           error: "알 수 없는 action입니다.",
-          available: ["campaigns", "adgroups", "keywords", "estimate", "set-bid", "schedule", "set-schedule"],
+          available: [
+            "campaigns",
+            "adgroups",
+            "keywords",
+            "estimate",
+            "set-bid",
+            "stats",
+            "schedule",
+            "set-schedule",
+          ],
         });
     }
   } catch (e) {
