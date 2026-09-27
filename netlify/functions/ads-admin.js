@@ -20,6 +20,9 @@
 //   ?action=set-schedule&ownerId=...&days=MON,TUE,WED,THU,FRI&ranges=9-12,13-18
 //     → 여러 시간대(예: 점심시간 12시~13시 제외) 설정. ranges는 "시작-끝" 구간을
 //        콤마로 나열 (각 구간의 끝 시간은 미포함). startHour/endHour 대신 사용 가능.
+//        ※ 네이버는 요일·시간 타겟팅을 캠페인이 아니라 "광고그룹" 단위로만 지원합니다.
+//        ownerId에 캠페인 ID(cmp-...)를 넣으면 그 캠페인 산하 모든 광고그룹에
+//        자동으로 같은 설정을 적용합니다. 광고그룹 ID(grp-...)를 넣으면 그 그룹에만 적용됩니다.
 const { request } = require("./lib/naver-api");
 
 const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -185,30 +188,69 @@ exports.handler = async (event) => {
           target[d] = activeDays.includes(d) ? mask : 0;
         }
 
-        // 기존 타겟(nccTargetId)이 있으면 수정(PUT)하고, 없으면(한 번도 요일/시간 설정을
-        // 켠 적 없는 캠페인/광고그룹) 새로 만듭니다(POST).
-        const existing = await request(
-          "GET",
-          `/ncc/targets?ownerId=${encodeURIComponent(q.ownerId)}&types=TIME_WEEKLY_TARGET`
-        );
-
-        let result;
-        if (existing && existing.length) {
-          const targetId = existing[0].nccTargetId;
-          result = await request("PUT", `/ncc/targets/${encodeURIComponent(targetId)}`, {
-            nccTargetId: targetId,
-            ownerId: q.ownerId,
-            targetTp: "TIME_WEEKLY_TARGET",
-            target,
-          });
-        } else {
-          result = await request("POST", "/ncc/targets", {
-            ownerId: q.ownerId,
-            targetTp: "TIME_WEEKLY_TARGET",
-            target,
-          });
+        // 네이버 API에는 TIME_WEEKLY_TARGET을 "새로 만드는" 엔드포인트가 따로 없습니다
+        // (targets 리소스는 GET/PUT만 있고, 기존 타겟이 있어야 PUT으로 수정 가능).
+        // 그리고 요일·시간 타겟팅은 캠페인이 아니라 "광고그룹" 단위로만 걸 수 있습니다
+        // (캠페인 PUT은 userLock/budget/period만 지원, targetTime은 광고그룹 PUT에만 있음).
+        // 그래서 처음 설정하는 경우엔 광고그룹을 PUT(?fields=targetTime)해서 만들어야 합니다.
+        async function applyToAdgroup(adgroupId) {
+          const existing = await request(
+            "GET",
+            `/ncc/targets?ownerId=${encodeURIComponent(adgroupId)}&types=TIME_WEEKLY_TARGET`
+          );
+          if (existing && existing.length) {
+            const targetId = existing[0].nccTargetId;
+            return {
+              adgroupId,
+              created: false,
+              result: await request("PUT", `/ncc/targets/${encodeURIComponent(targetId)}`, {
+                nccTargetId: targetId,
+                ownerId: adgroupId,
+                targetTp: "TIME_WEEKLY_TARGET",
+                target,
+              }),
+            };
+          }
+          return {
+            adgroupId,
+            created: true,
+            result: await request(
+              "PUT",
+              `/ncc/adgroups/${encodeURIComponent(adgroupId)}?fields=targetTime`,
+              {
+                nccAdgroupId: adgroupId,
+                targets: [{ targetTp: "TIME_WEEKLY_TARGET", target }],
+              }
+            ),
+          };
         }
-        return json(200, { created: !existing || !existing.length, appliedMask: mask, activeDays, result });
+
+        const isCampaign = q.ownerId.startsWith("cmp-");
+        if (!isCampaign) {
+          const r = await applyToAdgroup(q.ownerId);
+          return json(200, { appliedMask: mask, activeDays, ...r });
+        }
+
+        // 캠페인 ID가 들어오면, 그 캠페인의 모든 광고그룹에 동일하게 적용합니다.
+        const adgroups = await request(
+          "GET",
+          `/ncc/adgroups?nccCampaignId=${encodeURIComponent(q.ownerId)}`
+        );
+        const results = [];
+        for (const g of adgroups) {
+          try {
+            results.push(await applyToAdgroup(g.nccAdgroupId));
+          } catch (e) {
+            results.push({ adgroupId: g.nccAdgroupId, error: String(e.message || e) });
+          }
+        }
+        return json(200, {
+          appliedMask: mask,
+          activeDays,
+          campaignId: q.ownerId,
+          adgroupCount: adgroups.length,
+          results,
+        });
       }
 
       default:
