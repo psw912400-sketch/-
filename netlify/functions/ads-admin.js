@@ -357,6 +357,60 @@ exports.handler = async (event) => {
         return json(200, result);
       }
 
+      // 비즈채널(사이트/전화번호/주소 등) 목록 조회. channelTp로 필터 가능 (SITE, PHONE, ADDRESS, ...).
+      case "channels": {
+        const uri = q.channelTp ? `/ncc/channels?channelTp=${encodeURIComponent(q.channelTp)}` : "/ncc/channels";
+        const result = await request("GET", uri);
+        return json(200, result);
+      }
+
+      // 확장소재 목록 조회 (ownerId = 캠페인 또는 광고그룹 ID)
+      case "ad-extensions": {
+        if (!q.ownerId) return json(400, { error: "ownerId 파라미터가 필요합니다" });
+        const result = await request("GET", `/ncc/ad-extensions?ownerId=${encodeURIComponent(q.ownerId)}`);
+        return json(200, result);
+      }
+
+      // 확장소재를 최대 50개까지 한 번에 생성합니다. URL 길이 제한을 피하려고 POST 본문으로 받습니다.
+      //   POST ?action=create-ad-extensions
+      //   body: {"items": [
+      //     {"ownerId":"grp-...","type":"PHONE","pcChannelId":"bsn-...","mobileChannelId":"bsn-...","adExtension":null},
+      //     {"ownerId":"grp-...","type":"PROMOTION","pcChannelId":"bsn-...","mobileChannelId":"bsn-...",
+      //      "adExtension":{"basicText":"...","additionalText":"..."}},
+      //     {"ownerId":"grp-...","type":"SUB_LINKS","pcChannelId":"bsn-...","mobileChannelId":"bsn-...",
+      //      "adExtension":[{"name":"...","final":"https://..."}, ...]}
+      //   ]}
+      // 각 항목은 네이버 API에 개별 POST /ncc/ad-extensions 호출로 순서대로 생성됩니다 (이 엔드포인트는 벌크 생성 자체를 지원하지 않음).
+      case "create-ad-extensions": {
+        if (!parsedBody || !Array.isArray(parsedBody.items) || !parsedBody.items.length) {
+          return json(400, { error: "POST 본문에 비어있지 않은 items 배열이 필요합니다" });
+        }
+        if (parsedBody.items.length > 50) {
+          return json(400, { error: "한 번에 최대 50개까지만 가능합니다" });
+        }
+        const results = [];
+        for (const it of parsedBody.items) {
+          if (!it.ownerId || !it.type || !it.pcChannelId || !it.mobileChannelId) {
+            results.push({ error: "ownerId, type, pcChannelId, mobileChannelId가 필요합니다", item: it });
+            continue;
+          }
+          try {
+            const created = await request("POST", "/ncc/ad-extensions", {
+              ownerId: it.ownerId,
+              type: it.type,
+              pcChannelId: it.pcChannelId,
+              mobileChannelId: it.mobileChannelId,
+              adExtension: it.adExtension != null ? it.adExtension : undefined,
+              userLock: false,
+            });
+            results.push({ ok: true, ownerId: it.ownerId, type: it.type, result: created });
+          } catch (e) {
+            results.push({ ok: false, ownerId: it.ownerId, type: it.type, error: String(e.message || e) });
+          }
+        }
+        return json(200, { results });
+      }
+
       default:
         return json(400, {
           error: "알 수 없는 action입니다.",
@@ -372,6 +426,9 @@ exports.handler = async (event) => {
             "adgroup-targets",
             "estimate-bulk",
             "set-bid-bulk",
+            "channels",
+            "ad-extensions",
+            "create-ad-extensions",
           ],
         });
     }
