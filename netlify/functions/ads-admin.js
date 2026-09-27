@@ -193,7 +193,8 @@ exports.handler = async (event) => {
       // 최대 200개 키워드까지 입찰가를 한 번에 변경합니다 (네이버 API 자체 제한).
       // URL 길이 제한을 피하려고 items 배열은 POST 요청 본문(JSON)으로 받습니다:
       //   POST ?action=set-bid-bulk
-      //   body: {"items": [{"nccKeywordId":"nkw-...","bidAmt":650}, ...]}   (최대 200개)
+      //   body: {"items": [{"nccKeywordId":"nkw-...","nccAdgroupId":"grp-...","bidAmt":650}, ...]}   (최대 200개)
+      // nccAdgroupId는 네이버 bulk 수정 API가 필수로 요구합니다.
       // (레거시: GET + itemsB64=base64(JSON배열) 쿼리파라미터도 계속 지원합니다.)
       case "set-bid-bulk": {
         let items;
@@ -216,13 +217,18 @@ exports.handler = async (event) => {
         }
         const body = [];
         for (const it of items) {
-          if (!it.nccKeywordId || typeof it.bidAmt !== "number") {
-            return json(400, { error: "각 항목은 nccKeywordId, bidAmt(숫자)가 필요합니다" });
+          if (!it.nccKeywordId || !it.nccAdgroupId || typeof it.bidAmt !== "number") {
+            return json(400, { error: "각 항목은 nccKeywordId, nccAdgroupId, bidAmt(숫자)가 필요합니다" });
           }
           if (it.bidAmt < 70 || it.bidAmt > 100000) {
             return json(400, { error: `bidAmt는 70~100000 사이여야 합니다: ${it.nccKeywordId}=${it.bidAmt}` });
           }
-          body.push({ nccKeywordId: it.nccKeywordId, bidAmt: it.bidAmt, useGroupBidAmt: false });
+          body.push({
+            nccKeywordId: it.nccKeywordId,
+            nccAdgroupId: it.nccAdgroupId,
+            bidAmt: it.bidAmt,
+            useGroupBidAmt: false,
+          });
         }
         const result = await request("PUT", "/ncc/keywords?fields=bidAmt", body);
         return json(200, result);
