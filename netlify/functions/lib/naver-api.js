@@ -22,11 +22,12 @@ function sign(timestamp, method, uri, secretKey) {
 function request(method, uri, body) {
   return new Promise((resolve, reject) => {
     const timestamp = Date.now().toString();
-    // 환경변수를 Netlify에 붙여넣는 과정에서 앞뒤 공백이나 줄바꿈이 섞여 들어가는 경우가 있어서,
-    // HTTP 헤더에 넣기 전에 항상 trim() 해서 정리합니다.
-    const apiKey = (process.env.NAVER_API_KEY || "").trim();
-    const secretKey = (process.env.NAVER_SECRET_KEY || "").trim();
-    const customerId = (process.env.NAVER_CUSTOMER_ID || "").trim();
+    // 환경변수를 Netlify에 붙여넣는 과정에서 공백이나 줄바꿈이 섞여 들어가는 경우가 있어서,
+    // HTTP 헤더에 넣기 전에 모든 공백류 문자를 제거해서 정리합니다.
+    const clean = (v) => (v || "").replace(/\s+/g, "");
+    const apiKey = clean(process.env.NAVER_API_KEY);
+    const secretKey = clean(process.env.NAVER_SECRET_KEY);
+    const customerId = clean(process.env.NAVER_CUSTOMER_ID);
 
     if (!apiKey || !secretKey || !customerId) {
       return reject(new Error("네이버 API 키가 설정되지 않았습니다 (환경변수 확인 필요)"));
