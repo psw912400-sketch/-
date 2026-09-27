@@ -9,9 +9,15 @@
 | 변수명 | 설명 | 필수 여부 |
 |---|---|---|
 | `ADMIN_TOKEN` | 의심 IP 리포트 페이지를 볼 때 쓰는 비밀 토큰 (직접 아무 문자열이나 정하시면 됩니다, 예: 랜덤 영문+숫자 20자) | 필수 |
+| `BLOBS_SITE_ID` | Netlify **Project configuration > General > Project details**에 있는 "Project ID"(=Site ID) 값 | 필수 |
+| `BLOBS_AUTH_TOKEN` | Netlify 우측 상단 프로필 아이콘 > **User settings > Applications > Personal access tokens > New access token**에서 새로 발급한 토큰 | 필수 |
 | `NAVER_API_KEY` | 네이버 검색광고 API 키 (도구 > API 사용 관리에서 발급) | 자동 IP 차단을 원하시면 필요 |
 | `NAVER_SECRET_KEY` | 네이버 검색광고 API 시크릿 키 | 자동 IP 차단을 원하시면 필요 |
 | `NAVER_CUSTOMER_ID` | 네이버 검색광고 계정 고객 ID (CUST_ID) | 자동 IP 차단을 원하시면 필요 |
+
+> `BLOBS_SITE_ID`/`BLOBS_AUTH_TOKEN`는 방문 기록 저장(Netlify Blobs)이 일부 배포 환경에서
+> 자동으로 연결되지 않는 문제 때문에 직접 지정해주는 값입니다. ("This function has crashed -
+> MissingBlobsEnvironmentError" 오류가 났다면 이 두 값이 빠졌거나 잘못된 것입니다.)
 
 ## 지금 작동하는 기능
 

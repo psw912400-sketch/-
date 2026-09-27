@@ -3,7 +3,7 @@
 //   https://올바른종합환경.com/.netlify/functions/abuse-report?token=여기에_ADMIN_TOKEN_값
 //
 // ADMIN_TOKEN은 Netlify 사이트 설정 > Environment variables 에서 직접 정하시면 됩니다.
-const { getStore } = require("@netlify/blobs");
+const { getBlobStore } = require("./lib/blob-store");
 
 exports.handler = async (event) => {
   const token = event.queryStringParameters && event.queryStringParameters.token;
@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     return { statusCode: 401, body: "Unauthorized" };
   }
 
-  const flagStore = getStore("abuse-flags");
+  const flagStore = getBlobStore("abuse-flags");
   const flagged = (await flagStore.get("flagged.json", { type: "json" })) || [];
   flagged.sort((a, b) => b.count - a.count);
 

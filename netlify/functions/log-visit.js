@@ -1,6 +1,6 @@
 // 네이버(검색결과)에서 들어온 방문을 기록하는 함수.
 // 방문자 경험에는 전혀 영향을 주지 않도록, 어떤 경우에도 빠르게 응답합니다.
-const { getStore } = require("@netlify/blobs");
+const { getBlobStore } = require("./lib/blob-store");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -28,7 +28,7 @@ exports.handler = async (event) => {
       ts: Date.now(),
     };
 
-    const store = getStore("click-logs");
+    const store = getBlobStore("click-logs");
     const key = `visits/${record.ts}-${Math.random().toString(36).slice(2, 8)}.json`;
     await store.setJSON(key, record);
 

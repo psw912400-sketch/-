@@ -6,7 +6,7 @@
 // 네이버 검색광고 API 키를 발급받으시면, 이 목록을 실제로 네이버의
 // "노출 제한 IP" 설정에 자동으로 등록하는 코드를 추가로 연동해드릴 수 있습니다.
 // (naver-api.js에 자리를 마련해뒀습니다)
-const { getStore } = require("@netlify/blobs");
+const { getBlobStore } = require("./lib/blob-store");
 const { registerExcludedIp } = require("./lib/naver-api");
 
 const WINDOW_MS = 3 * 60 * 60 * 1000; // 최근 3시간
@@ -14,7 +14,7 @@ const THRESHOLD = 5; // 3시간 내 5회 이상이면 의심
 const RETENTION_MS = 7 * 24 * 60 * 60 * 1000; // 7일 지난 로그는 삭제
 
 exports.handler = async () => {
-  const store = getStore("click-logs");
+  const store = getBlobStore("click-logs");
   const now = Date.now();
   const { blobs } = await store.list({ prefix: "visits/" });
 
@@ -42,7 +42,7 @@ exports.handler = async () => {
     .filter(([, ts]) => ts.length >= THRESHOLD)
     .map(([ip, ts]) => ({ ip, count: ts.length, lastSeen: Math.max(...ts) }));
 
-  const flagStore = getStore("abuse-flags");
+  const flagStore = getBlobStore("abuse-flags");
   const existing = (await flagStore.get("flagged.json", { type: "json" })) || [];
   const byIp = Object.fromEntries(existing.map((f) => [f.ip, f]));
 
