@@ -86,4 +86,4 @@ async function registerExcludedIp(ip) {
   });
 }
 
-module.exports = { registerExcludedIp, listExcludedIps, sign };
+module.exports = { registerExcludedIp, listExcludedIps, sign, request };
