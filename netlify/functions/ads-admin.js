@@ -17,6 +17,9 @@
 //   ?action=set-schedule&ownerId=...&days=MON,TUE,WED,THU,FRI&startHour=9&endHour=18
 //     → 요일·시간 타겟팅 설정 (startHour~endHour 시간대만 노출, endHour는 미포함:
 //        예) startHour=9&endHour=18 => 09시~17시59분까지 노출)
+//   ?action=set-schedule&ownerId=...&days=MON,TUE,WED,THU,FRI&ranges=9-12,13-18
+//     → 여러 시간대(예: 점심시간 12시~13시 제외) 설정. ranges는 "시작-끝" 구간을
+//        콤마로 나열 (각 구간의 끝 시간은 미포함). startHour/endHour 대신 사용 가능.
 const { request } = require("./lib/naver-api");
 
 const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -35,6 +38,21 @@ function buildHourMask(startHour, endHour) {
   let mask = 0;
   for (let h = startHour; h < endHour; h++) {
     mask += Math.pow(2, h);
+  }
+  return mask;
+}
+
+// "9-12,13-18" 같은 문자열을 받아 여러 구간을 합친 마스크를 만듭니다
+// (각 구간 끝 시간은 미포함, 예: 9-12 => 9,10,11시).
+function buildHourMaskFromRanges(rangesStr) {
+  let mask = 0;
+  const parts = rangesStr.split(",").map((s) => s.trim()).filter(Boolean);
+  for (const part of parts) {
+    const m = part.match(/^(\d{1,2})-(\d{1,2})$/);
+    if (!m) throw new Error(`ranges 형식이 올바르지 않습니다: "${part}" (예: 9-12,13-18)`);
+    const start = Number(m[1]);
+    const end = Number(m[2]);
+    mask |= buildHourMask(start, end);
   }
   return mask;
 }
@@ -148,13 +166,19 @@ exports.handler = async (event) => {
       }
 
       case "set-schedule": {
-        if (!q.ownerId || !q.days || !q.startHour || !q.endHour) {
-          return json(400, { error: "ownerId, days(예: MON,TUE), startHour, endHour 파라미터가 필요합니다" });
+        if (!q.ownerId || !q.days || !(q.ranges || (q.startHour && q.endHour))) {
+          return json(400, {
+            error:
+              "ownerId, days(예: MON,TUE) 파라미터와, startHour+endHour 또는 ranges(예: 9-12,13-18) 파라미터가 필요합니다",
+          });
         }
-        const startHour = Number(q.startHour);
-        const endHour = Number(q.endHour);
         const activeDays = q.days.split(",").map((d) => d.trim().toUpperCase());
-        const mask = buildHourMask(startHour, endHour);
+        let mask;
+        try {
+          mask = q.ranges ? buildHourMaskFromRanges(q.ranges) : buildHourMask(Number(q.startHour), Number(q.endHour));
+        } catch (e) {
+          return json(400, { error: String(e.message || e) });
+        }
 
         const target = {};
         for (const d of DAYS) {
