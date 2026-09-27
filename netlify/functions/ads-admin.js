@@ -185,25 +185,30 @@ exports.handler = async (event) => {
           target[d] = activeDays.includes(d) ? mask : 0;
         }
 
-        // 기존 타겟(nccTargetId)을 먼저 찾아서 업데이트해야 합니다 (새로 만드는 게 아니라 수정).
+        // 기존 타겟(nccTargetId)이 있으면 수정(PUT)하고, 없으면(한 번도 요일/시간 설정을
+        // 켠 적 없는 캠페인/광고그룹) 새로 만듭니다(POST).
         const existing = await request(
           "GET",
           `/ncc/targets?ownerId=${encodeURIComponent(q.ownerId)}&types=TIME_WEEKLY_TARGET`
         );
-        if (!existing || !existing.length) {
-          return json(404, {
-            error: "이 owner에 대한 TIME_WEEKLY_TARGET이 없습니다. campaignId/adgroupId가 맞는지 확인해주세요.",
+
+        let result;
+        if (existing && existing.length) {
+          const targetId = existing[0].nccTargetId;
+          result = await request("PUT", `/ncc/targets/${encodeURIComponent(targetId)}`, {
+            nccTargetId: targetId,
+            ownerId: q.ownerId,
+            targetTp: "TIME_WEEKLY_TARGET",
+            target,
+          });
+        } else {
+          result = await request("POST", "/ncc/targets", {
+            ownerId: q.ownerId,
+            targetTp: "TIME_WEEKLY_TARGET",
+            target,
           });
         }
-        const targetId = existing[0].nccTargetId;
-
-        const result = await request("PUT", `/ncc/targets/${encodeURIComponent(targetId)}`, {
-          nccTargetId: targetId,
-          ownerId: q.ownerId,
-          targetTp: "TIME_WEEKLY_TARGET",
-          target,
-        });
-        return json(200, { appliedMask: mask, activeDays, result });
+        return json(200, { created: !existing || !existing.length, appliedMask: mask, activeDays, result });
       }
 
       default:
