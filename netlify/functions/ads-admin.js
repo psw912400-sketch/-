@@ -120,13 +120,22 @@ exports.handler = async (event) => {
         const fields = q.fields || "impCnt,clkCnt,ctr,avgRnk,salesAmt";
         const fieldsArr = fields.split(",").map((f) => f.trim());
         const datePreset = q.datePreset || "last30days";
-        const idsArr = JSON.stringify(q.ids.split(",").map((s) => s.trim()));
+        const idsJson = JSON.stringify(q.ids.split(",").map((s) => s.trim()));
         const fieldsJson = JSON.stringify(fieldsArr);
-        const uri = `/stats?ids=${encodeURIComponent(idsArr)}&fields=${encodeURIComponent(
+        const uri = `/stats?ids=${encodeURIComponent(idsJson)}&fields=${encodeURIComponent(
           fieldsJson
         )}&datePreset=${encodeURIComponent(datePreset)}`;
-        const result = await request("GET", uri);
-        return json(200, result);
+        try {
+          const result = await request("GET", uri);
+          return json(200, result);
+        } catch (e1) {
+          // 일부 계정/버전은 ids를 콤마 구분 문자열 그대로 요구합니다 - 폴백 시도.
+          const uri2 = `/stats?ids=${encodeURIComponent(q.ids)}&fields=${encodeURIComponent(
+            fieldsJson
+          )}&datePreset=${encodeURIComponent(datePreset)}`;
+          const result2 = await request("GET", uri2);
+          return json(200, result2);
+        }
       }
 
       case "schedule": {
