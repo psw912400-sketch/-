@@ -253,6 +253,12 @@ exports.handler = async (event) => {
         });
       }
 
+      case "adgroup-targets": {
+        if (!q.adgroupId) return json(400, { error: "adgroupId 파라미터가 필요합니다" });
+        const result = await request("GET", `/ncc/adgroups/${encodeURIComponent(q.adgroupId)}/targets`);
+        return json(200, result);
+      }
+
       default:
         return json(400, {
           error: "알 수 없는 action입니다.",
@@ -265,6 +271,7 @@ exports.handler = async (event) => {
             "stats",
             "schedule",
             "set-schedule",
+            "adgroup-targets",
           ],
         });
     }
