@@ -33,7 +33,10 @@ function request(method, uri, body) {
       return reject(new Error("네이버 API 키가 설정되지 않았습니다 (환경변수 확인 필요)"));
     }
 
-    const signature = sign(timestamp, method, uri, secretKey);
+    // 서명은 쿼리스트링을 뺀 순수 경로로만 계산해야 합니다 (네이버 공식 샘플 코드 기준:
+    // 쿼리 파라미터가 있는 요청도 서명 시 uri에는 쿼리스트링을 포함하지 않음).
+    const pathOnly = uri.split("?")[0];
+    const signature = sign(timestamp, method, pathOnly, secretKey);
     const payload = body ? JSON.stringify(body) : undefined;
 
     const options = {
