@@ -1,0 +1,10 @@
+[build]
+  publish = "."
+  command = "npm install"
+
+[functions]
+  directory = "netlify/functions"
+
+# 1시간마다 자동으로 방문 로그를 분석해서 의심 IP를 찾아냅니다.
+[functions."check-abuse"]
+  schedule = "@hourly"

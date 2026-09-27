@@ -1,0 +1,1302 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>올바른종합환경 | B2B 건물위생관리 · 청소 전문</title>
+<meta name="description" content="에어컨 클리닝, 바닥 왁스, 카페트 청소, 사무실 청소부터 정기 계약까지. 건물위생관리업 정식 등록, 하도급 없이 직접 시공하는 올바른종합환경.">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  :root{
+    --navy:#173A63;
+    --navy-dark:#0F2A4A;
+    --yellow:#FFC933;
+    --white:#FFFFFF;
+    --gray-100:#F5F5F7;
+    --gray-200:#E8E8ED;
+    --gray-500:#86868B;
+    --gray-700:#1D1D1F;
+    --divider:#D2D2D7;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    color:var(--gray-700);
+    background:var(--white);
+    line-height:1.47;
+    -webkit-font-smoothing:antialiased;
+    word-break:keep-all;
+    overflow-wrap:break-word;
+  }
+  img{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  ul{margin:0;padding:0;list-style:none;}
+  h1,h2,h3,p,dl,dd,dt,figure{margin:0;}
+  button{font-family:inherit;}
+
+  :focus-visible{outline:2px solid var(--navy);outline-offset:3px;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px;}
+
+  /* ---------- Nav ---------- */
+  .site-nav{
+    position:sticky;top:0;z-index:50;
+    height:48px;
+    display:flex;align-items:center;
+    background:rgba(15,42,74,.82);
+    backdrop-filter:saturate(180%) blur(16px);
+    -webkit-backdrop-filter:saturate(180%) blur(16px);
+  }
+  .nav-inner{
+    position:relative;
+    max-width:1180px;margin:0 auto;padding:0 24px;
+    width:100%;
+    display:flex;align-items:center;justify-content:flex-end;
+  }
+  .nav-links{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%);
+    display:flex;gap:28px;align-items:center;
+  }
+  .nav-links a{color:rgba(255,255,255,.82);font-size:12.5px;font-weight:400;transition:color .15s;}
+  .nav-links a:hover{color:var(--white);}
+  .nav-dropdown-wrap{position:relative;}
+  .nav-services-btn{
+    background:none;border:none;cursor:pointer;font-family:inherit;
+    color:rgba(255,255,255,.82);font-size:12.5px;font-weight:400;padding:4px 0;
+    transition:color .15s;
+  }
+  .nav-services-btn:hover{color:var(--white);}
+  .nav-dropdown-panel{
+    position:absolute;top:100%;left:50%;
+    transform:translateX(-50%) translateY(6px);
+    background:var(--white);border-radius:14px;
+    box-shadow:0 20px 44px rgba(0,0,0,.2);
+    padding:8px;display:flex;flex-direction:column;
+    min-width:180px;
+    opacity:0;pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease;
+    z-index:70;
+  }
+  .nav-dropdown-panel.open{
+    opacity:1;pointer-events:auto;
+    transform:translateX(-50%) translateY(2px);
+  }
+  .nav-dropdown-panel a{
+    color:var(--gray-700);font-size:13.5px;font-weight:500;
+    padding:9px 12px;border-radius:9px;text-align:left;
+  }
+  .nav-dropdown-panel a:hover{background:var(--gray-100);color:var(--gray-700);}
+  .nav-cta{display:flex;align-items:center;gap:16px;}
+  .nav-phone{color:rgba(255,255,255,.7);font-size:12.5px;}
+  .nav-btn{
+    background:var(--white);color:var(--navy-dark);
+    font-size:12.5px;font-weight:600;
+    padding:6px 14px;border-radius:980px;
+  }
+  .nav-toggle{
+    display:none;width:32px;height:32px;background:none;border:none;color:var(--white);
+    align-items:center;justify-content:center;
+  }
+
+  /* ---------- Buttons / links ---------- */
+  .btn-pill{
+    display:inline-flex;align-items:center;justify-content:center;
+    background:var(--navy);color:var(--white);
+    font-size:17px;font-weight:500;
+    padding:12px 26px;border-radius:980px;
+    transition:background .15s ease;
+  }
+  .btn-pill:hover{background:var(--navy-dark);}
+  .btn-pill.lg{font-size:19px;padding:14px 32px;}
+  .btn-pill.block{width:100%;}
+  .link-chevron{
+    color:var(--navy);font-size:17px;font-weight:500;
+  }
+  .link-chevron::after{content:" \203A";}
+
+  /* ---------- Reveal ---------- */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1;transform:translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1;transform:none;transition:none;}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{padding:52px 0 0;text-align:center;background:var(--white);}
+  .hero-logo-wrap{text-align:left;margin-bottom:28px;}
+  .hero-logo-img{height:52px;width:auto;}
+  .hero .wrap{position:relative;}
+  .hero-badges{
+    position:absolute;top:0;right:24px;
+    display:flex;flex-direction:column;align-items:flex-end;gap:12px;
+  }
+  .badge-img{width:88px;height:auto;}
+  .hero h1{
+    font-size:clamp(28px,4.8vw,54px);
+    font-weight:800;
+    letter-spacing:-.03em;
+    line-height:1.16;
+    color:var(--gray-700);
+  }
+  .hero .sub{
+    margin:16px auto 0;
+    max-width:560px;
+    font-size:clamp(16px,1.8vw,19px);
+    color:var(--gray-500);
+    line-height:1.5;
+  }
+  .hero-actions{
+    margin-top:24px;
+    display:flex;gap:26px;align-items:center;justify-content:center;flex-wrap:wrap;
+  }
+  .hero-media{width:100%;margin-top:40px;}
+  .hero-slideshow{position:relative;width:100%;height:min(72vh,640px);overflow:hidden;}
+  .hero-slideshow img{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+    opacity:0;transition:opacity 1.4s ease;
+  }
+  .hero-slideshow img.active{opacity:1;}
+
+  /* ---------- Category overview (inside hero) ---------- */
+  .cat-grid{
+    margin-top:28px;
+    display:flex;flex-wrap:nowrap;justify-content:center;
+    gap:10px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:2px;
+  }
+  .cat-item{
+    flex:0 0 auto;
+    padding:11px 20px;
+    border-radius:980px;
+    background:var(--gray-100);
+    color:var(--gray-700);
+    font-size:14.5px;
+    font-weight:600;
+    white-space:nowrap;
+    transition:background .15s ease, color .15s ease;
+  }
+  .cat-item:hover{background:var(--navy);color:var(--white);}
+
+  /* ---------- Feature sections ---------- */
+  .feature{padding:100px 0;}
+  .feature.gray{background:var(--gray-100);}
+  .feature-copy{max-width:640px;margin:0 auto;text-align:center;}
+  .feature-copy .eyebrow{font-size:15px;font-weight:600;color:var(--navy);margin-bottom:10px;}
+  .feature-copy h2{
+    font-size:clamp(30px,4.5vw,52px);
+    font-weight:800;
+    letter-spacing:-.025em;
+    line-height:1.12;
+  }
+  .feature-copy p{
+    margin-top:16px;
+    font-size:clamp(16px,1.6vw,19px);
+    color:var(--gray-500);
+    line-height:1.55;
+  }
+  .feature-media{
+    margin-top:52px;
+    border-radius:24px;
+    overflow:hidden;
+  }
+  .feature-media img{width:100%;height:520px;object-fit:cover;}
+  .feature-media.split{
+    display:grid;grid-template-columns:1fr 1fr;gap:16px;
+    border-radius:0;overflow:visible;
+  }
+  .feature-media.split.triple{grid-template-columns:repeat(3,1fr);}
+  .feature-media.split figure{border-radius:24px;overflow:hidden;position:relative;}
+  .feature-media.split img{height:420px;}
+  .feature-media.split.triple img{height:320px;}
+  .media-caption{
+    position:absolute;left:0;right:0;bottom:0;
+    padding:24px 20px 16px;
+    background:linear-gradient(180deg, rgba(15,42,74,0), rgba(15,42,74,.75));
+    color:var(--white);font-size:14px;font-weight:600;
+  }
+
+  /* ---------- Feature detail: tags / process / necessity ---------- */
+  .tag-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:40px;}
+  .tag-chip{
+    border:1px solid var(--divider);border-radius:980px;
+    padding:8px 18px;font-size:13.5px;color:var(--gray-700);background:var(--white);
+  }
+  .process-row{
+    display:flex;justify-content:center;gap:0;margin-top:60px;
+    max-width:900px;margin-left:auto;margin-right:auto;
+  }
+  .process-step{flex:1;text-align:center;position:relative;padding:0 14px;}
+  .process-step::before{
+    content:"";position:absolute;top:16px;left:-50%;width:100%;height:1px;background:var(--divider);z-index:0;
+  }
+  .process-step:first-child::before{display:none;}
+  .process-step .n{
+    position:relative;z-index:1;
+    width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;
+    font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;
+    margin:0 auto 14px;
+  }
+  .process-step .t{font-size:13px;color:var(--gray-500);line-height:1.5;}
+  .necessity-band{
+    margin-top:56px;background:#EEF2F8;border-radius:20px;padding:36px 44px;
+    max-width:760px;margin-left:auto;margin-right:auto;text-align:center;
+  }
+  .necessity-band p{font-size:clamp(17px,2vw,21px);font-weight:500;color:var(--navy-dark);line-height:1.6;}
+
+  @media (max-width:700px){
+    .process-row{flex-direction:column;gap:20px;max-width:280px;}
+    .process-step{padding:0;}
+    .process-step::before{display:none;}
+    .process-step{display:flex;align-items:center;gap:14px;text-align:left;}
+    .process-step .n{margin:0;flex-shrink:0;}
+  }
+
+  /* ---------- Office-care card grid ---------- */
+  .care-grid{
+    margin-top:52px;
+    display:grid;grid-template-columns:repeat(3,1fr);
+    gap:1px;background:var(--divider);
+    border-radius:24px;overflow:hidden;
+  }
+  .care-grid.two-col{grid-template-columns:repeat(2,1fr);max-width:760px;margin-left:auto;margin-right:auto;}
+  .care-grid.one-col{grid-template-columns:1fr;max-width:400px;margin-left:auto;margin-right:auto;}
+  .care-card{
+    background:var(--white);padding:40px 30px;text-align:left;
+  }
+  .care-card .icon{width:34px;height:34px;color:var(--navy);margin-bottom:20px;}
+  .care-card h3{font-size:19px;font-weight:700;letter-spacing:-.01em;}
+  .care-card p{margin-top:8px;font-size:14.5px;color:var(--gray-500);line-height:1.6;}
+  .care-card ul{margin-top:16px;}
+  .care-card li{
+    font-size:13.5px;color:var(--gray-500);line-height:1.5;
+    padding-left:14px;position:relative;margin-top:8px;
+  }
+  .care-card li::before{
+    content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--navy);
+  }
+
+  /* ---------- Floating booking CTA ---------- */
+  .fab-book{
+    position:fixed;right:24px;bottom:24px;z-index:60;
+    background:var(--navy);color:var(--white);
+    font-size:15px;font-weight:600;
+    padding:15px 26px;border-radius:980px;
+    box-shadow:0 10px 30px rgba(15,42,74,.35);
+    transition:background .15s ease, transform .15s ease;
+  }
+  .fab-book:hover{background:var(--navy-dark);transform:translateY(-1px);}
+  .fab-blog{
+    position:fixed;right:24px;bottom:88px;z-index:60;
+    background:var(--white);color:var(--navy);
+    font-size:14px;font-weight:600;
+    padding:12px 22px;border-radius:980px;
+    border:1.5px solid var(--navy);
+    display:inline-flex;align-items:center;gap:8px;
+    box-shadow:0 8px 22px rgba(15,42,74,.16);
+    transition:background .15s ease, transform .15s ease;
+  }
+  .fab-blog:hover{background:var(--gray-100);transform:translateY(-1px);}
+  @media (max-width:560px){
+    .fab-book{
+      left:16px;right:16px;bottom:16px;
+      text-align:center;padding:16px 0;
+    }
+    .fab-blog{
+      left:16px;right:16px;bottom:78px;
+      justify-content:center;padding:13px 0;
+    }
+  }
+
+
+  .booking{scroll-margin-top:48px;}
+
+  /* ---------- Floating kakao / phone ---------- */
+  .fab-round{
+    position:fixed;right:24px;z-index:60;
+    width:52px;height:52px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 22px rgba(15,42,74,.22);
+    transition:transform .15s ease;
+  }
+  .fab-round:hover{transform:translateY(-2px);}
+  .fab-round svg{width:26px;height:26px;}
+  .fab-round[hidden]{display:none;}
+  .fab-kakao{background:#FEE500;bottom:144px;}
+  .fab-kakao svg{fill:#191919;}
+  .fab-tel{background:var(--navy);bottom:208px;}
+  .fab-tel svg{fill:#fff;}
+  .fab-kakao[hidden] ~ .fab-tel{bottom:144px;}
+  @media (max-width:560px){
+    .fab-round{right:16px;}
+    .fab-kakao{bottom:138px;}
+    .fab-tel{bottom:200px;}
+    .fab-kakao[hidden] ~ .fab-tel{bottom:138px;}
+  }
+
+  /* ---------- Stats (dark) ---------- */
+  .stats{background:var(--navy-dark);color:var(--white);padding:96px 0;}
+  .stats .feature-copy h2{color:var(--white);}
+  .stats .feature-copy p{color:rgba(255,255,255,.6);}
+  .stat-grid{
+    margin-top:60px;
+    display:grid;grid-template-columns:repeat(4,1fr);
+  }
+  .stat-item{
+    padding:0 24px;text-align:center;
+    border-left:1px solid rgba(255,255,255,.14);
+  }
+  .stat-item:first-child{border-left:none;}
+  .stat-item .num{font-size:clamp(28px,3.2vw,40px);font-weight:800;letter-spacing:-.02em;}
+  .stat-item .label{margin-top:10px;font-size:13.5px;color:rgba(255,255,255,.6);line-height:1.5;}
+
+  /* ---------- Booking ---------- */
+  .booking{background:var(--gray-100);padding:100px 0;}
+  .booking-grid{margin-top:52px;display:grid;grid-template-columns:0.8fr 1.3fr;gap:56px;align-items:start;}
+  .booking-info dl{display:flex;flex-direction:column;gap:22px;}
+  .booking-info dt{font-size:12.5px;color:var(--gray-500);margin-bottom:4px;}
+  .booking-info dd{font-size:17px;font-weight:600;}
+  .booking-info dd a{border-bottom:1px solid var(--divider);}
+
+  .booking-cta-box{
+    background:var(--white);border-radius:24px;padding:40px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    display:flex;flex-direction:column;align-items:flex-start;gap:18px;
+  }
+  .booking-cta-box p{font-size:15px;color:var(--gray-500);line-height:1.6;}
+
+  .booking-modal{
+    display:none;
+    position:fixed;inset:0;z-index:200;
+    align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .booking-modal.open{display:flex;}
+  .booking-modal-backdrop{
+    position:absolute;inset:0;
+    background:rgba(15,42,74,.55);
+    backdrop-filter:blur(2px);
+  }
+  .booking-modal-panel{
+    position:relative;
+    background:var(--gray-100);
+    border-radius:24px;
+    max-width:640px;width:100%;
+    max-height:88vh;overflow-y:auto;
+    padding:36px;
+    box-shadow:0 30px 60px rgba(0,0,0,.3);
+  }
+  .booking-modal-title{
+    font-size:clamp(20px,3vw,26px);font-weight:800;letter-spacing:-.02em;
+    margin-top:8px;margin-bottom:24px;color:var(--gray-700);
+  }
+  .booking-modal-close{
+    position:absolute;top:16px;right:16px;
+    width:36px;height:36px;border-radius:50%;
+    background:var(--white);border:1px solid var(--divider);
+    font-size:20px;line-height:1;color:var(--gray-500);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .booking-modal-close:hover{background:var(--gray-100);color:var(--gray-700);}
+  body.modal-open{overflow:hidden;}
+
+  form.booking-form{
+    background:var(--white);border-radius:24px;padding:40px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+  }
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .field{margin-bottom:18px;}
+  .field.full{grid-column:1/-1;}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:7px;}
+  .field .req{color:#C0392B;margin-left:2px;}
+  .field input[type="text"],.field input[type="tel"],.field input[type="email"],
+  .field input[type="date"],.field select,.field textarea{
+    width:100%;padding:13px 14px;font-size:14.5px;font-family:inherit;
+    border:1px solid var(--divider);border-radius:12px;background:var(--white);color:var(--gray-700);
+  }
+  .field textarea{resize:vertical;min-height:96px;}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--navy);}
+  .check-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px;}
+  .check-option{
+    display:flex;align-items:center;gap:9px;border:1px solid var(--divider);border-radius:12px;
+    padding:11px 12px;font-size:14px;cursor:pointer;background:var(--white);
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .check-option:has(input:checked){border-color:var(--navy);background:#EEF2F8;}
+  .check-option input{width:16px;height:16px;flex-shrink:0;accent-color:var(--navy);}
+  .radio-row{display:flex;gap:16px;flex-wrap:wrap;}
+  .radio-option{display:flex;align-items:center;gap:8px;font-size:14px;}
+  .radio-option input{accent-color:var(--navy);}
+  .freq-field{margin-top:14px;padding-top:14px;border-top:1px solid var(--divider);display:none;}
+  .freq-field.show{display:block;}
+  .form-note{font-size:12.5px;color:var(--gray-500);margin-top:6px;line-height:1.6;}
+  .form-status{margin-top:16px;padding:14px 16px;border-radius:12px;font-size:14px;display:none;}
+  .form-status.show{display:block;}
+  .form-status.ok{background:#E7F3EA;color:#1E6B34;}
+  .form-status.err{background:#FBEAEA;color:#A32E2E;}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--gray-100);padding:44px 0 28px;font-size:12.5px;color:var(--gray-500);}
+  .footer-top{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-bottom:24px;border-bottom:1px solid var(--divider);}
+  .footer-brand strong{display:block;color:var(--gray-700);font-size:15px;font-weight:700;margin-bottom:6px;}
+  .footer-logo-img{height:36px;width:auto;display:block;margin-bottom:10px;}
+  .footer-cols{display:flex;gap:56px;flex-wrap:wrap;}
+  .footer-col h4{font-weight:600;color:var(--gray-700);font-size:12px;margin-bottom:10px;}
+  .footer-col p{line-height:1.9;}
+  .footer-bottom{padding-top:18px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+
+  /* ---------- Mobile ---------- */
+  @media (max-width:860px){
+    .nav-links{display:none;}
+    .nav-toggle{display:flex;}
+    .nav-phone{display:none;}
+    .hero-logo-wrap{margin-bottom:40px;}
+    .hero-badges{
+      display:grid;grid-template-columns:repeat(2,auto);
+      gap:6px 10px;justify-items:end;
+    }
+    .badge-img{width:50px;}
+    .feature-media.split{grid-template-columns:1fr;}
+    .feature-media.split.triple{grid-template-columns:1fr;}
+    .care-grid{grid-template-columns:1fr;}
+    .stat-grid{grid-template-columns:repeat(2,1fr);row-gap:32px;}
+    .stat-item:nth-child(3){border-left:none;}
+    .booking-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:560px){
+    .form-grid{grid-template-columns:1fr;}
+    .check-grid{grid-template-columns:1fr;}
+    .hero-slideshow{height:340px;}
+    .feature-media img{height:320px;}
+    form.booking-form{padding:26px;}
+    .booking-modal-panel{padding:22px;}
+  }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="nav-inner">
+    <div class="nav-links" id="navLinks">
+      <div class="nav-dropdown-wrap">
+        <button type="button" class="nav-services-btn" id="navServicesBtn" aria-expanded="false" aria-controls="navServicesPanel">서비스 항목</button>
+        <div class="nav-dropdown-panel" id="navServicesPanel">
+          <a href="#services">에어컨 클리닝</a>
+          <a href="#floor">바닥 왁스</a>
+          <a href="#floor">바닥 청소</a>
+          <a href="#carpet">카페트 청소</a>
+          <a href="#office">사무실 청소</a>
+          <a href="#office-care">정기 청소</a>
+          <a href="#school">학교 청소</a>
+          <a href="#school-hood">학교 급식실 후드 청소</a>
+          <a href="#chair">사무실 의자 청소</a>
+        </div>
+      </div>
+      <a href="#why">회사소개</a>
+      <a href="https://blog.naver.com/pink123bird" target="_blank" rel="noopener noreferrer">블로그</a>
+      <a href="#booking" class="js-open-booking">예약문의</a>
+    </div>
+    <div class="nav-cta">
+      <a class="nav-phone" href="tel:010-4705-7970">010-4705-7970</a>
+      <a class="nav-btn js-open-booking" href="#booking">예약 신청</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="mobileNav">
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</nav>
+<div id="mobileNav" style="display:none;background:var(--navy-dark);">
+  <div class="wrap" style="display:flex;flex-direction:column;padding:10px 24px 18px;">
+    <button type="button" id="mnavServicesBtn" style="background:none;border:none;color:#fff;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:15px;font-family:inherit;text-align:left;display:flex;justify-content:space-between;align-items:center;width:100%;">
+      서비스 항목 <span id="mnavServicesChev" style="font-size:12px;color:rgba(255,255,255,.5);">▾</span>
+    </button>
+    <div id="mnavServicesPanel" style="display:none;flex-direction:column;padding:4px 0 4px 14px;border-bottom:1px solid rgba(255,255,255,.1);">
+      <a href="#services" style="color:rgba(255,255,255,.8);padding:10px 0;font-size:14px;">에어컨 클리닝</a>
+      <a href="#floor" style="color:rgba(255,255,255,.8);padding:10px 0;font-size:14px;">바닥 왁스</a>
+      <a href="#floor" style="color:rgba(255,255,255,.8);padding:10px 0;font-size:14px;">바닥 청소</a>
+      <a href="#carpet" style="color:rgba(255,255,255,.8);padding:10px 0;font-size:14px;">카페트 청소</a>
+      <a href="#office" style="color:rgba(255,255,255,.8);padding:10px 0;font-size:14px;">사무실 청소</a>
+      <a href="#office-care" style="color:rgba(255,255,255,.8);padding:10px 0;font-size:14px;">정기 청소</a>
+      <a href="#school" style="color:rgba(255,255,255,.8);padding:10px 0;font-size:14px;">학교 청소</a>
+      <a href="#school-hood" style="color:rgba(255,255,255,.8);padding:10px 0;font-size:14px;">학교 급식실 후드 청소</a>
+      <a href="#chair" style="color:rgba(255,255,255,.8);padding:10px 0;font-size:14px;">사무실 의자 청소</a>
+    </div>
+    <a href="#why" style="color:#fff;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);">회사소개</a>
+    <a href="https://blog.naver.com/pink123bird" target="_blank" rel="noopener noreferrer" style="color:#fff;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);">블로그</a>
+    <a href="#booking" class="js-open-booking" style="color:#fff;padding:12px 0;">예약문의</a>
+    <a href="tel:010-4705-7970" style="color:var(--yellow);padding:12px 0 0;font-weight:700;">전화 문의 010-4705-7970</a>
+  </div>
+</div>
+
+<section class="hero" id="home">
+  <div class="wrap">
+    <div class="hero-logo-wrap">
+      <img src="images/logo-horizontal.png" alt="바른종합환경 로고" class="hero-logo-img">
+    </div>
+    <div class="hero-badges">
+      <img src="images/badge-jodalcheong.png" alt="조달청" class="badge-img">
+      <img src="images/badge-narajangter.png" alt="나라장터 등록업체" class="badge-img">
+      <img src="images/badge-s2b.png" alt="S2B 학교장터 등록업체" class="badge-img">
+      <img src="images/badge-womenbiz.png" alt="여성기업 확인" class="badge-img">
+    </div>
+    <h1>품질 높은 청소 서비스,<br>깨끗한 환경을 만듭니다.</h1>
+    <p class="sub">건물위생관리업 정식 등록 업체가 하도급 없이 직접 시공합니다.</p>
+    <div class="hero-actions">
+      <a href="#booking" class="btn-pill lg js-open-booking">예약 신청하기</a>
+      <a href="#services" class="link-chevron">서비스 살펴보기</a>
+    </div>
+    <div class="cat-grid reveal">
+      <a href="#services" class="cat-item">에어컨 클리닝</a>
+      <a href="#floor" class="cat-item">바닥 왁스</a>
+      <a href="#floor" class="cat-item">바닥 청소</a>
+      <a href="#carpet" class="cat-item">카페트 청소</a>
+      <a href="#office" class="cat-item">사무실 청소</a>
+      <a href="#office-care" class="cat-item">정기 청소</a>
+      <a href="#school" class="cat-item">학교 청소</a>
+      <a href="#school-hood" class="cat-item">후드 청소</a>
+      <a href="#chair" class="cat-item">의자 청소</a>
+    </div>
+  </div>
+  <div class="hero-media">
+    <div class="hero-slideshow" id="heroSlideshow">
+      <img src="images/ac-covering.jpg" alt="에어컨 세척" class="active">
+      <img src="images/floor-wax-during.jpg" alt="바닥 왁스 작업">
+      <img src="images/carpet-wand.jpg" alt="카페트 세척">
+      <img src="images/office-wide.jpg" alt="사무실 청소">
+      <img src="images/school-lobby.jpg" alt="학교 청소">
+      <img src="images/hood-pressure-wash.jpg" alt="학교 급식실 후드 청소">
+      <img src="images/chair-sofa-wash.jpg" alt="사무실 의자 청소">
+    </div>
+  </div>
+</section>
+
+<section class="feature" id="services">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow">에어컨 클리닝</div>
+      <h2>보이지 않는 곳까지<br>완전히 분해해 씻어냅니다.</h2>
+      <p>벽걸이형·스탠드형·시스템 에어컨 분해 세척부터 냉난방기 종합 세척까지, 현장에서 직접 처리합니다.</p>
+    </div>
+    <div class="feature-media split triple reveal">
+      <figure>
+        <img src="images/ac-covering.jpg" alt="에어컨 실내기를 분해하고 보양 작업 중인 모습">
+        <figcaption class="media-caption">분해·보양</figcaption>
+      </figure>
+      <figure>
+        <img src="images/ac-disassembly.jpg" alt="에어컨 부품을 하나하나 분리해 놓은 모습">
+        <figcaption class="media-caption">부품별 분리 세척</figcaption>
+      </figure>
+      <figure>
+        <img src="images/ac-reassembly.jpg" alt="세척 후 에어컨 내부 기판을 점검하며 재조립하는 모습">
+        <figcaption class="media-caption">재조립·점검</figcaption>
+      </figure>
+    </div>
+    <div class="tag-row reveal">
+      <span class="tag-chip">필터 세척</span>
+      <span class="tag-chip">열교환기 고압 세척</span>
+      <span class="tag-chip">송풍팬 세척</span>
+      <span class="tag-chip">배수관 점검</span>
+      <span class="tag-chip">살균 소독</span>
+      <span class="tag-chip">외관 청소</span>
+    </div>
+    <div class="process-row reveal">
+      <div class="process-step"><div class="n">1</div><div class="t">사전 점검</div></div>
+      <div class="process-step"><div class="n">2</div><div class="t">보양(비닐 커버링)</div></div>
+      <div class="process-step"><div class="n">3</div><div class="t">분해·고압 세척</div></div>
+      <div class="process-step"><div class="n">4</div><div class="t">살균 소독</div></div>
+      <div class="process-step"><div class="n">5</div><div class="t">재조립·시운전</div></div>
+    </div>
+    <div class="necessity-band reveal">
+      <p>에어컨 내부는 습기와 먼지가 쌓이기 쉬워 곰팡이와 세균이 번식하기 좋은 환경입니다. 정기적으로 세척하지 않으면 냄새와 알레르기, 냉방 효율 저하로 이어질 수 있습니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="feature gray" id="floor">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow">바닥 왁스 · 바닥 청소</div>
+      <h2>광택은 물론,<br>바닥 전체를 관리합니다.</h2>
+      <p>사무실·복도 바닥 왁스 코팅으로 광택을 복원하고, 화장실·계단 등 전 구역 물청소와 소독까지 함께 진행합니다.</p>
+    </div>
+    <div class="feature-media split triple reveal">
+      <figure>
+        <img src="images/floor-wax-before.jpg" alt="왁스 작업 전 벽면에 낀 오염이 그대로 드러난 모습">
+        <figcaption class="media-caption">오염 확인</figcaption>
+      </figure>
+      <figure>
+        <img src="images/floor-wax-during.jpg" alt="바닥을 물걸레로 마무리 작업하는 모습">
+        <figcaption class="media-caption">왁스 작업</figcaption>
+      </figure>
+      <figure>
+        <img src="images/floor-wax-after.jpg" alt="왁스 시공이 끝난 뒤 광택이 도는 바닥">
+        <figcaption class="media-caption">시공 완료</figcaption>
+      </figure>
+    </div>
+    <div class="tag-row reveal">
+      <span class="tag-chip">먼지·오염 제거</span>
+      <span class="tag-chip">왁스 코팅</span>
+      <span class="tag-chip">광택 마감</span>
+      <span class="tag-chip">화장실·계단 물청소</span>
+      <span class="tag-chip">소독 병행</span>
+    </div>
+    <div class="process-row reveal">
+      <div class="process-step"><div class="n">1</div><div class="t">가구·집기 이동</div></div>
+      <div class="process-step"><div class="n">2</div><div class="t">초벌 세척</div></div>
+      <div class="process-step"><div class="n">3</div><div class="t">왁스 코팅</div></div>
+      <div class="process-step"><div class="n">4</div><div class="t">건조·마감</div></div>
+    </div>
+    <div class="necessity-band reveal">
+      <p>바닥은 사람이 가장 많이 딛는 공간이라 미끄럼과 마모가 가장 먼저 나타납니다. 주기적인 왁스 코팅은 바닥을 보호하고 미끄럼 사고를 예방합니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="feature" id="carpet">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow">카페트 청소</div>
+      <h2>깊숙이 쌓인 먼지까지<br>습식으로 씻어냅니다.</h2>
+      <p>사무 공간과 회의실 카펫·러그를 진공·습식 세척으로 관리해 오염과 냄새를 함께 제거합니다.</p>
+    </div>
+    <div class="feature-media split triple reveal">
+      <figure>
+        <img src="images/carpet-wand.jpg" alt="카페트를 습식 추출 방식으로 세척하는 모습">
+        <figcaption class="media-caption">습식 추출</figcaption>
+      </figure>
+      <figure>
+        <img src="images/carpet-contrast.jpg" alt="세척 전후 카페트 색상 차이가 뚜렷하게 드러나는 모습">
+        <figcaption class="media-caption">세척 전후 비교</figcaption>
+      </figure>
+      <figure>
+        <img src="images/carpet-finished.jpg" alt="카페트 청소가 완료된 사무 공간">
+        <figcaption class="media-caption">시공 완료</figcaption>
+      </figure>
+    </div>
+    <div class="tag-row reveal">
+      <span class="tag-chip">진공 제거</span>
+      <span class="tag-chip">습식 추출 세척</span>
+      <span class="tag-chip">얼룩 집중 관리</span>
+      <span class="tag-chip">탈취·건조</span>
+    </div>
+    <div class="process-row reveal">
+      <div class="process-step"><div class="n">1</div><div class="t">표면 진공 청소</div></div>
+      <div class="process-step"><div class="n">2</div><div class="t">습식 추출 세척</div></div>
+      <div class="process-step"><div class="n">3</div><div class="t">얼룩 부위 관리</div></div>
+      <div class="process-step"><div class="n">4</div><div class="t">건조</div></div>
+    </div>
+    <div class="necessity-band reveal">
+      <p>카펫은 먼지와 세균이 가장 오래 머무는 공간 중 하나입니다. 진공청소만으로는 제거되지 않는 깊은 오염이 정기적인 습식 세척 없이는 그대로 쌓입니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="feature gray" id="office">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow">사무실 청소</div>
+      <h2>매일 쓰는 공간이라서,<br>더 꼼꼼하게 봅니다.</h2>
+      <p>책상 밑, 파티션 사이처럼 눈에 잘 띄지 않는 곳까지 — 일상 청소부터 대청소까지 관리합니다.</p>
+    </div>
+    <div class="feature-media split triple reveal">
+      <figure>
+        <img src="images/office-floor.jpg" alt="사무 공간 바닥을 세척기로 관리하는 모습">
+        <figcaption class="media-caption">바닥 관리</figcaption>
+      </figure>
+      <figure>
+        <img src="images/office-detail.jpg" alt="책상 밑 구석까지 청소하는 모습">
+        <figcaption class="media-caption">구석구석 청소</figcaption>
+      </figure>
+      <figure>
+        <img src="images/office-wide.jpg" alt="사무 공간 전체를 관리하는 모습">
+        <figcaption class="media-caption">공간 전체 관리</figcaption>
+      </figure>
+    </div>
+    <div class="tag-row reveal">
+      <span class="tag-chip">책상·집기 먼지 제거</span>
+      <span class="tag-chip">바닥 물청소</span>
+      <span class="tag-chip">파티션·구석 관리</span>
+      <span class="tag-chip">쓰레기 처리</span>
+      <span class="tag-chip">공용공간 정리</span>
+    </div>
+    <div class="necessity-band reveal">
+      <p>사무 공간은 매일 사람이 머무는 곳이라 먼지와 오염이 가장 빨리 쌓입니다. 책상 밑이나 파티션 사이처럼 눈에 잘 띄지 않는 곳까지 챙겨야 쾌적한 환경이 유지됩니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="feature" id="office-care">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow">사무 공간 케어</div>
+      <h2>정기 계약부터<br>입주 청소까지.</h2>
+      <p>업무에 방해되지 않는 시간대로, 필요한 만큼만 관리받으세요.</p>
+    </div>
+    <div class="care-grid two-col reveal">
+      <div class="care-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 0114-5.3M20 12a8 8 0 01-14 5.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M18 4v3.5H14.5M6 20v-3.5H9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>정기 청소</h3>
+        <p>주·월·분기 단위로 담당 인력을 고정 배정해 동일하게 관리합니다.</p>
+        <ul>
+          <li>주·2주·월·분기 주기 선택</li>
+          <li>동일 담당자 고정 배정</li>
+          <li>체크리스트 기반 품질 관리</li>
+        </ul>
+      </div>
+      <div class="care-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M4 10l8-5 8 5v9a1 1 0 01-1 1H5a1 1 0 01-1-1v-9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 20v-5h4v5" stroke="currentColor" stroke-width="1.5"/></svg>
+        <h3>사무실 입주 청소</h3>
+        <p>이전·오픈 전 새 공간을 바닥부터 유리, 집기까지 정리합니다.</p>
+        <ul>
+          <li>바닥 왁스 및 유리창 청소</li>
+          <li>마감재 오염·잔재 제거</li>
+          <li>집기 반입 전 소독</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="feature gray" id="school">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow">학교 청소</div>
+      <h2>교실부터 로비까지,<br>방학 기간에 집중 관리합니다.</h2>
+      <p>학기 중에는 손대기 어려운 창틀·복도·행정실까지, 정해진 기간 안에 빠짐없이 관리해 온 경험이 있습니다.</p>
+    </div>
+    <div class="feature-media split triple reveal">
+      <figure>
+        <img src="images/school-rail.jpg" alt="교실 창틀과 난간을 세척하는 모습">
+        <figcaption class="media-caption">창틀·난간 세척</figcaption>
+      </figure>
+      <figure>
+        <img src="images/school-lobby.jpg" alt="대형 로비를 자동 세척기로 관리하는 모습">
+        <figcaption class="media-caption">로비·복도 관리</figcaption>
+      </figure>
+      <figure>
+        <img src="images/school-hallway.jpg" alt="청소가 끝난 뒤 광택이 도는 복도">
+        <figcaption class="media-caption">시공 완료</figcaption>
+      </figure>
+    </div>
+    <div class="tag-row reveal">
+      <span class="tag-chip">창틀·유리 세척</span>
+      <span class="tag-chip">교실·복도 바닥 청소</span>
+      <span class="tag-chip">행정실 바닥 관리</span>
+      <span class="tag-chip">대형 로비 광택 작업</span>
+      <span class="tag-chip">방학 중 집중 대청소</span>
+    </div>
+    <div class="necessity-band reveal">
+      <p>학교는 학기 중에 전체 공간을 손대기 어려워, 방학처럼 정해진 기간에 교실부터 행정실까지 한 번에 관리해야 합니다. 여러 학교의 방학 대청소를 진행해 온 경험으로 빠짐없이 챙깁니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="feature" id="school-hood">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow">학교 급식실 후드 청소</div>
+      <h2>기름때 쌓인 후드 속까지,<br>고압으로 완전히 씻어냅니다.</h2>
+      <p>급식실·조리실 후드와 덕트 내부에 쌓인 기름때를 고압 세척으로 제거하고, 그리스필터 분리 세척과 주변 바닥·배수로 정리까지 함께 진행합니다.</p>
+    </div>
+    <div class="feature-media split triple reveal">
+      <figure>
+        <img src="images/hood-detergent.jpg" alt="후드 표면에 세제를 도포하고 불림 작업을 하는 모습">
+        <figcaption class="media-caption">세제 도포·불림</figcaption>
+      </figure>
+      <figure>
+        <img src="images/hood-pressure-wash.jpg" alt="후드와 덕트 내부를 고압으로 세척하는 모습">
+        <figcaption class="media-caption">고압 세척</figcaption>
+      </figure>
+      <figure>
+        <img src="images/hood-filter.jpg" alt="그리스필터를 분리해 세척하는 모습">
+        <figcaption class="media-caption">필터 분리 세척</figcaption>
+      </figure>
+    </div>
+    <div class="tag-row reveal">
+      <span class="tag-chip">후드 내부 고압 세척</span>
+      <span class="tag-chip">덕트 내부 세척</span>
+      <span class="tag-chip">그리스필터 분리 세척</span>
+      <span class="tag-chip">기름때 불림 작업</span>
+      <span class="tag-chip">바닥·배수로 청소 병행</span>
+      <span class="tag-chip">방학·휴무일 작업 가능</span>
+    </div>
+    <div class="process-row reveal">
+      <div class="process-step"><div class="n">1</div><div class="t">사전 보양(비닐 커버링)</div></div>
+      <div class="process-step"><div class="n">2</div><div class="t">세제 도포·불림</div></div>
+      <div class="process-step"><div class="n">3</div><div class="t">고압 세척</div></div>
+      <div class="process-step"><div class="n">4</div><div class="t">필터·복구 마감</div></div>
+    </div>
+    <div class="necessity-band reveal">
+      <p>급식실 후드와 덕트에 기름때가 쌓이면 화재 위험이 커지고 냄새와 위생 문제로도 이어집니다. 정기적인 전문 세척으로 화재 예방과 급식 위생 기준을 함께 지킬 수 있습니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="feature gray" id="chair">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow">사무실 의자 청소</div>
+      <h2>매일 앉는 의자도,<br>속까지 세척합니다.</h2>
+      <p>메쉬 원단 사무용 의자부터 패브릭 소파·라운지 체어까지, 습식 추출 세척으로 눈에 보이지 않는 오염까지 제거합니다.</p>
+    </div>
+    <div class="feature-media split triple reveal">
+      <figure>
+        <img src="images/chair-mesh-wash.jpg" alt="사무용 메쉬 의자를 습식 추출 방식으로 세척하는 모습">
+        <figcaption class="media-caption">메쉬 원단 세척</figcaption>
+      </figure>
+      <figure>
+        <img src="images/chair-sofa-wash.jpg" alt="패브릭 소파를 습식 추출 세척하는 모습">
+        <figcaption class="media-caption">패브릭 소파 세척</figcaption>
+      </figure>
+      <figure>
+        <img src="images/chair-team-wide.jpg" alt="여러 대의 사무용 의자를 동시에 세척하는 모습">
+        <figcaption class="media-caption">다수 의자 동시 작업</figcaption>
+      </figure>
+    </div>
+    <div class="tag-row reveal">
+      <span class="tag-chip">메쉬 원단 세척</span>
+      <span class="tag-chip">패브릭 소파·라운지 체어</span>
+      <span class="tag-chip">습식 추출 세척</span>
+      <span class="tag-chip">얼룩 집중 관리</span>
+      <span class="tag-chip">탈취·건조</span>
+      <span class="tag-chip">대량 동시 작업 가능</span>
+    </div>
+    <div class="process-row reveal">
+      <div class="process-step"><div class="n">1</div><div class="t">오염도 확인</div></div>
+      <div class="process-step"><div class="n">2</div><div class="t">사전 보양</div></div>
+      <div class="process-step"><div class="n">3</div><div class="t">습식 추출 세척</div></div>
+      <div class="process-step"><div class="n">4</div><div class="t">탈취·건조</div></div>
+    </div>
+    <div class="necessity-band reveal">
+      <p>의자는 매일 사람이 접촉하는 만큼 땀과 먼지, 세균이 가장 빠르게 쌓이는 곳입니다. 진공청소만으로는 제거되지 않는 깊은 오염을 습식 추출 세척으로 관리해야 쾌적하게 사용할 수 있습니다.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stats" id="why">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow" style="color:var(--yellow);">올바른종합환경</div>
+      <h2>원칙으로 운영합니다.</h2>
+      <p>건물위생관리업으로 정식 등록된 업체로서, 확인 가능한 실적과 원칙을 지킵니다.</p>
+    </div>
+    <div class="stat-grid reveal">
+      <div class="stat-item">
+        <div class="num">0건</div>
+        <div class="label">재하청 없이<br>전 공정 직영 시공</div>
+      </div>
+      <div class="stat-item">
+        <div class="num">2023</div>
+        <div class="label">건물위생관리업<br>제2023-00079호 등록</div>
+      </div>
+      <div class="stat-item">
+        <div class="num">여성기업</div>
+        <div class="label">확인서 제0118-2023<br>-29903호 보유</div>
+      </div>
+      <div class="stat-item">
+        <div class="num">다수</div>
+        <div class="label">학교·공공기관<br>시공 실적</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="booking" id="booking">
+  <div class="wrap">
+    <div class="feature-copy reveal" style="text-align:left;max-width:100%;">
+      <div class="eyebrow">예약 신청</div>
+      <h2 style="font-size:clamp(28px,4vw,40px);">필요한 서비스와<br>희망 일정을 남겨주세요.</h2>
+    </div>
+
+    <div class="booking-grid reveal">
+      <div class="booking-info">
+        <dl>
+          <div><dt>전화 문의</dt><dd><a href="tel:010-4705-7970">010-4705-7970</a></dd></div>
+          <div><dt>보조 연락처</dt><dd><a href="tel:010-7795-2322">010-7795-2322</a></dd></div>
+          <div><dt>이메일</dt><dd><a href="mailto:psw2322@naver.com">psw2322@naver.com</a></dd></div>
+        </dl>
+      </div>
+
+      <div class="booking-cta-box">
+        <p>업체·기관명, 필요한 서비스, 희망 일정을 남겨주시면 확인 후 영업일 기준 1일 이내 연락드립니다. 현장 사진이나 상세 요청사항도 함께 적어주시면 더 정확하게 안내해 드릴 수 있습니다.</p>
+        <button type="button" class="btn-pill lg js-open-booking">예약 신청서 작성하기</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="booking-modal" id="bookingModal" aria-hidden="true">
+  <div class="booking-modal-backdrop" id="bookingModalBackdrop"></div>
+  <div class="booking-modal-panel" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
+    <button type="button" class="booking-modal-close" id="bookingModalClose" aria-label="닫기">&times;</button>
+    <div class="eyebrow">예약 신청</div>
+    <h3 class="booking-modal-title" id="bookingModalTitle">필요한 서비스와 희망 일정을 남겨주세요.</h3>
+
+    <form class="booking-form" id="bookingForm">
+      <div class="form-grid">
+        <div class="field">
+          <label for="company">업체·기관명 <span class="req">*</span></label>
+          <input type="text" id="company" name="company" required>
+        </div>
+        <div class="field">
+          <label for="contact">담당자명 <span class="req">*</span></label>
+          <input type="text" id="contact" name="contact" required>
+        </div>
+        <div class="field">
+          <label for="phone">연락처 <span class="req">*</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="010-0000-0000" required>
+        </div>
+        <div class="field">
+          <label for="email">이메일</label>
+          <input type="email" id="email" name="email">
+        </div>
+        <div class="field">
+          <label for="facility">시설 유형</label>
+          <select id="facility" name="facility">
+            <option value="사무실">사무실·오피스</option>
+            <option value="학교">학교</option>
+            <option value="공공기관">공공기관</option>
+            <option value="상가매장">상가·매장</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="date">희망 일정</label>
+          <input type="date" id="date" name="date">
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>필요 서비스 (중복 선택 가능)</label>
+        <div class="check-grid">
+          <label class="check-option"><input type="checkbox" name="service" value="에어컨 클리닝"> 에어컨 클리닝</label>
+          <label class="check-option"><input type="checkbox" name="service" value="바닥 왁스"> 바닥 왁스</label>
+          <label class="check-option"><input type="checkbox" name="service" value="바닥 청소"> 바닥 청소</label>
+          <label class="check-option"><input type="checkbox" name="service" value="카페트 청소"> 카페트 청소</label>
+          <label class="check-option"><input type="checkbox" name="service" value="사무실 청소"> 사무실 청소</label>
+          <label class="check-option"><input type="checkbox" name="service" value="사무실 입주 청소"> 사무실 입주 청소</label>
+          <label class="check-option"><input type="checkbox" name="service" value="학교 급식실 후드 청소"> 학교 급식실 후드 청소</label>
+          <label class="check-option"><input type="checkbox" name="service" value="사무실 의자 청소"> 사무실 의자 청소</label>
+          <label class="check-option" style="grid-column:1/-1;"><input type="checkbox" id="recurringCheck" name="service" value="정기 청소"> 정기 청소</label>
+        </div>
+        <div class="freq-field" id="freqField">
+          <label for="freq">희망 주기</label>
+          <select id="freq" name="frequency">
+            <option value="주 1회">주 1회</option>
+            <option value="2주 1회">2주 1회</option>
+            <option value="월 1회">월 1회</option>
+            <option value="분기 1회">분기 1회</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>계약 형태</label>
+        <div class="radio-row">
+          <label class="radio-option"><input type="radio" name="contractType" value="1회성" checked> 1회성 시공</label>
+          <label class="radio-option"><input type="radio" name="contractType" value="정기계약 문의"> 정기 계약 문의</label>
+        </div>
+      </div>
+
+      <div class="field full">
+        <label>현장 주차 가능 여부</label>
+        <div class="radio-row">
+          <label class="radio-option"><input type="radio" name="parking" value="주차 가능" checked> 주차 가능</label>
+          <label class="radio-option"><input type="radio" name="parking" value="주차 불가능"> 주차 불가능</label>
+          <label class="radio-option"><input type="radio" name="parking" value="확인 필요"> 잘 모르겠음</label>
+        </div>
+        <p class="form-note">왁스코팅·카페트 세척처럼 장비를 싣고 방문하는 작업은 현장 주차 여부에 따라 방문 일정과 준비물이 달라질 수 있습니다. 주차가 어려우신 경우 미리 알려주시면 방문 전에 미리 안내드리겠습니다.</p>
+      </div>
+
+      <div class="field full">
+        <label for="message">상세 요청사항</label>
+        <textarea id="message" name="message" placeholder="공간 크기, 층수, 특이사항 등을 적어주시면 도움이 됩니다."></textarea>
+      </div>
+
+      <button type="submit" class="btn-pill lg block" id="submitBtn">예약 신청하기</button>
+      <p class="form-note">신청 내용은 담당자 이메일로 바로 전달되며, 확인 후 영업일 기준 1일 이내 연락드립니다.</p>
+
+      <div class="form-status" id="formStatus"></div>
+    </form>
+  </div>
+</div>
+
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="images/logo-horizontal.png" alt="바른종합환경 로고" class="footer-logo-img">
+        <span>건물위생관리업 · 소독업 정식 등록 | 대표 박정분</span>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>연락처</h4>
+          <p>010-4705-7970<br>010-7795-2322<br>psw2322@naver.com</p>
+        </div>
+        <div class="footer-col">
+          <h4>등록 정보</h4>
+          <p>건물위생관리업 제2023-00079호<br>여성기업 확인 제0118-2023-29903호</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 올바른종합환경. All rights reserved.</span>
+      <span>본 페이지의 모든 시공은 하도급 없이 자사 인력으로 진행됩니다.</span>
+    </div>
+  </div>
+</footer>
+
+<a href="https://blog.naver.com/pink123bird" target="_blank" rel="noopener noreferrer" class="fab-blog">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11l5 5v11H4z"/><path d="M14 4v5h5"/><path d="M9 13h6M9 17h4"/></svg>
+  블로그
+</a>
+<a href="#booking" class="fab-book js-open-booking">예약 신청</a>
+<a id="fabKakao" class="fab-round fab-kakao" href="#" target="_blank" rel="noopener noreferrer" aria-label="카카오톡 채널로 상담하기" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.86 1.9 5.37 4.75 6.79l-.97 3.55c-.08.3.26.54.52.36l4.2-2.8c.5.06 1 .1 1.5.1 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>
+</a>
+<a id="fabTel" class="fab-round fab-tel" href="tel:010-4705-7970" aria-label="전화 상담 010-4705-7970">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/></svg>
+</a>
+
+<script>
+  // 카카오톡 채널 주소를 아래 따옴표 안에 넣으면 카카오톡 버튼이 나타납니다. 예: 'https://pf.kakao.com/_abcdE/chat'
+  var KAKAO_URL = '';
+  (function(){
+    var k = document.getElementById('fabKakao');
+    if(k && KAKAO_URL){ k.href = KAKAO_URL; k.hidden = false; }
+  })();
+
+  var navToggle = document.getElementById('navToggle');
+  var mobileNav = document.getElementById('mobileNav');
+  navToggle.addEventListener('click', function(){
+    var isOpen = mobileNav.style.display === 'block';
+    mobileNav.style.display = isOpen ? 'none' : 'block';
+    navToggle.setAttribute('aria-expanded', String(!isOpen));
+  });
+  mobileNav.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ mobileNav.style.display = 'none'; });
+  });
+
+  var recurringCheck = document.getElementById('recurringCheck');
+  var freqField = document.getElementById('freqField');
+  recurringCheck.addEventListener('change', function(){
+    freqField.classList.toggle('show', recurringCheck.checked);
+  });
+
+  // Booking modal
+  var bookingModal = document.getElementById('bookingModal');
+  var bookingModalBackdrop = document.getElementById('bookingModalBackdrop');
+  var bookingModalClose = document.getElementById('bookingModalClose');
+  var openBookingBtns = document.querySelectorAll('.js-open-booking');
+  var lastFocusedEl = null;
+
+  function getFocusableEls(container){
+    return container.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+  }
+
+  function onModalKeydown(e){
+    if(e.key === 'Escape' || e.keyCode === 27){
+      closeBookingModal();
+      return;
+    }
+    if(e.key === 'Tab' || e.keyCode === 9){
+      var focusables = getFocusableEls(bookingModal);
+      if(focusables.length === 0) return;
+      var first = focusables[0];
+      var last = focusables[focusables.length - 1];
+      if(e.shiftKey && document.activeElement === first){
+        e.preventDefault();
+        last.focus();
+      } else if(!e.shiftKey && document.activeElement === last){
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  function openBookingModal(e){
+    if(e) e.preventDefault();
+    if(mobileNav.style.display === 'block'){ mobileNav.style.display = 'none'; }
+    lastFocusedEl = document.activeElement;
+    bookingModal.classList.add('open');
+    bookingModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    var firstField = document.getElementById('company');
+    if(firstField){ firstField.focus(); }
+    document.addEventListener('keydown', onModalKeydown);
+  }
+
+  function closeBookingModal(){
+    bookingModal.classList.remove('open');
+    bookingModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    document.removeEventListener('keydown', onModalKeydown);
+    if(lastFocusedEl && typeof lastFocusedEl.focus === 'function'){
+      lastFocusedEl.focus();
+    }
+  }
+
+  openBookingBtns.forEach(function(btn){
+    btn.addEventListener('click', openBookingModal);
+  });
+  bookingModalBackdrop.addEventListener('click', closeBookingModal);
+  bookingModalClose.addEventListener('click', closeBookingModal);
+
+  // Desktop services dropdown
+  var navServicesBtn = document.getElementById('navServicesBtn');
+  var navServicesPanel = document.getElementById('navServicesPanel');
+  if(navServicesBtn && navServicesPanel){
+    navServicesBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var isOpen = navServicesPanel.classList.toggle('open');
+      navServicesBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+    navServicesPanel.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click', function(){
+        navServicesPanel.classList.remove('open');
+        navServicesBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!navServicesPanel.contains(e.target) && e.target !== navServicesBtn){
+        navServicesPanel.classList.remove('open');
+        navServicesBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // Mobile services accordion
+  var mnavServicesBtn = document.getElementById('mnavServicesBtn');
+  var mnavServicesPanel = document.getElementById('mnavServicesPanel');
+  var mnavServicesChev = document.getElementById('mnavServicesChev');
+  if(mnavServicesBtn && mnavServicesPanel){
+    mnavServicesBtn.addEventListener('click', function(){
+      var isOpen = mnavServicesPanel.style.display === 'flex';
+      mnavServicesPanel.style.display = isOpen ? 'none' : 'flex';
+      if(mnavServicesChev){ mnavServicesChev.textContent = isOpen ? '▾' : '▴'; }
+    });
+  }
+
+  // Hero slideshow (cycles through all services)
+  var heroSlideshow = document.getElementById('heroSlideshow');
+  if(heroSlideshow){
+    var slides = heroSlideshow.querySelectorAll('img');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(slides.length > 1 && !reduceMotion){
+      var current = 0;
+      setInterval(function(){
+        slides[current].classList.remove('active');
+        current = (current + 1) % slides.length;
+        slides[current].classList.add('active');
+      }, 3800);
+    }
+  }
+
+  // Scroll reveal
+  var revealEls = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.15});
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  // Booking form submit via FormSubmit (no backend required)
+  var form = document.getElementById('bookingForm');
+  var submitBtn = document.getElementById('submitBtn');
+  var statusBox = document.getElementById('formStatus');
+  var FORM_ENDPOINT = 'https://formsubmit.co/ajax/psw2322@naver.com';
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    var services = Array.from(form.querySelectorAll('input[name="service"]:checked')).map(function(el){ return el.value; });
+    if(services.length === 0){
+      statusBox.textContent = '필요 서비스를 한 가지 이상 선택해 주세요.';
+      statusBox.className = 'form-status show err';
+      return;
+    }
+
+    var payload = {
+      업체기관명: form.company.value,
+      담당자명: form.contact.value,
+      연락처: form.phone.value,
+      이메일: form.email.value || '(미입력)',
+      시설유형: form.facility.value,
+      희망일정: form.date.value || '(미지정)',
+      필요서비스: services.join(', '),
+      정기청소_희망주기: recurringCheck.checked ? form.frequency.value : '해당 없음',
+      계약형태: form.contractType.value,
+      현장주차가능여부: form.parking.value,
+      상세요청사항: form.message.value || '(없음)',
+      _subject: '[홈페이지 예약신청] ' + form.company.value + ' / ' + form.contact.value
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '전송 중...';
+    statusBox.className = 'form-status';
+
+    fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(res){ return res.json().then(function(data){ return {ok: res.ok, data: data}; }); })
+    .then(function(result){
+      if(result.ok){
+        statusBox.textContent = '신청이 접수되었습니다. 확인 후 빠르게 연락드리겠습니다.';
+        statusBox.className = 'form-status show ok';
+        form.reset();
+        freqField.classList.remove('show');
+      } else {
+        throw new Error('submit failed');
+      }
+    })
+    .catch(function(){
+      statusBox.textContent = '전송에 실패했습니다. 010-4705-7970으로 전화 주시거나 psw2322@naver.com으로 이메일 부탁드립니다.';
+      statusBox.className = 'form-status show err';
+    })
+    .finally(function(){
+      submitBtn.disabled = false;
+      submitBtn.textContent = '예약 신청하기';
+    });
+  });
+</script>
+<script>
+// 네이버 검색광고 부정클릭 방지용 방문 기록 스크립트
+// 네이버(search.naver.com)에서 들어온 방문만 조용히 기록합니다. 사이트 이용에는 영향이 없습니다.
+(function () {
+  try {
+    var ref = document.referrer || '';
+    if (ref.indexOf('naver.com') === -1) return;
+    var payload = JSON.stringify({
+      ref: ref,
+      page: location.pathname + location.search,
+      ts: Date.now()
+    });
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon('/.netlify/functions/log-visit', new Blob([payload], { type: 'application/json' }));
+    } else {
+      fetch('/.netlify/functions/log-visit', { method: 'POST', body: payload, keepalive: true });
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

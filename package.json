@@ -1,0 +1,8 @@
+{
+  "name": "olbareun-website",
+  "private": true,
+  "description": "올바른종합환경 홈페이지 + 네이버 검색광고 부정클릭 방지 기능",
+  "dependencies": {
+    "@netlify/blobs": "^11.0.0"
+  }
+}
