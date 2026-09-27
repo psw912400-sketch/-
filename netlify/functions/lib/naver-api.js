@@ -1,29 +1,25 @@
 // 네이버 검색광고 API 연동 헬퍼.
 //
-// 서명(인증 헤더) 생성 방식은 네이버 검색광고 API의 표준 인증 방식입니다
-// (timestamp + method + path 를 SECRET_KEY로 HMAC-SHA256 서명).
+// 서명(인증 헤더) 생성 방식: timestamp + method + uri 를 SECRET_KEY로 HMAC-SHA256 서명
+// (네이버 공식 파이썬/자바 샘플 코드의 signaturehelper와 동일한 방식).
 //
-// ⚠️ 중요: registerExcludedIp() 함수의 실제 엔드포인트(URL)는 아직 확인되지 않았습니다.
-// 네이버 검색광고 관리 시스템에서 API 키를 발급받으시면(도구 > API 사용 관리),
-// 함께 제공되는 API 문서에서 "노출 제한 IP 등록" 엔드포인트를 확인한 뒤
-// 아래 NAVER_EXCLUDE_IP_PATH 부분만 정확한 경로로 바꿔주면 바로 작동합니다.
-// 그 전까지는 이 함수는 에러를 던지고, check-abuse.js가 이를 "pending" 상태로
-// 남겨두고 다음 시간에 다시 시도합니다 (즉, 사이트나 다른 기능에는 영향 없음).
-
+// "노출 제한 IP 등록" 엔드포인트는 네이버 공식 API 문서 저장소
+// (github.com/naver/searchad-apidoc, gh-pages 브랜치의 swagger 스펙 원본)를 직접 확인해서
+// 찾은 값입니다: IpExclusion 리소스, POST /tool/ip-exclusions.
 const crypto = require("crypto");
 const https = require("https");
 
-const BASE_HOST = "api.naver.com";
+// 공식 파이썬 샘플 코드 기준 실제 운영 서버 주소입니다 (문서 사이트의 데모 호스트가 아님).
+const BASE_HOST = "api.searchad.naver.com";
 
-// TODO(확인 필요): 실제 "노출 제한 IP 등록/수정" API 경로로 교체
-const NAVER_EXCLUDE_IP_PATH = "/ncc/restricted-ips"; // 플레이스홀더
+const IP_EXCLUSIONS_PATH = "/tool/ip-exclusions";
 
-function sign(timestamp, method, path, secretKey) {
-  const message = `${timestamp}.${method}.${path}`;
+function sign(timestamp, method, uri, secretKey) {
+  const message = `${timestamp}.${method}.${uri}`;
   return crypto.createHmac("sha256", secretKey).update(message).digest("base64");
 }
 
-function request(method, path, body) {
+function request(method, uri, body) {
   return new Promise((resolve, reject) => {
     const timestamp = Date.now().toString();
     const apiKey = process.env.NAVER_API_KEY;
@@ -34,12 +30,12 @@ function request(method, path, body) {
       return reject(new Error("네이버 API 키가 설정되지 않았습니다 (환경변수 확인 필요)"));
     }
 
-    const signature = sign(timestamp, method, path, secretKey);
+    const signature = sign(timestamp, method, uri, secretKey);
     const payload = body ? JSON.stringify(body) : undefined;
 
     const options = {
       hostname: BASE_HOST,
-      path,
+      path: uri,
       method,
       headers: {
         "Content-Type": "application/json; charset=UTF-8",
@@ -68,10 +64,23 @@ function request(method, path, body) {
   });
 }
 
-async function registerExcludedIp(ip) {
-  // 실제 엔드포인트가 확인되기 전까지는 호출을 시도하되,
-  // 잘못된 경로라면 자연스럽게 실패하고 다음 주기에 재시도됩니다.
-  return request("POST", NAVER_EXCLUDE_IP_PATH, { ip });
+// 이미 등록된 제외 IP 목록을 가져옵니다 (중복 등록 방지용).
+async function listExcludedIps() {
+  const result = await request("GET", IP_EXCLUSIONS_PATH);
+  return Array.isArray(result) ? result : [];
 }
 
-module.exports = { registerExcludedIp, sign };
+async function registerExcludedIp(ip) {
+  const existing = await listExcludedIps();
+  const already = existing.some((e) => e.filterIp === ip);
+  if (already) {
+    return { skipped: true, reason: "already registered" };
+  }
+
+  return request("POST", IP_EXCLUSIONS_PATH, {
+    filterIp: ip,
+    memo: "부정클릭 자동 탐지 (사이트 방문 로그 기반)",
+  });
+}
+
+module.exports = { registerExcludedIp, listExcludedIps, sign };
