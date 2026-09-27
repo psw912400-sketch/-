@@ -70,6 +70,17 @@ exports.handler = async (event) => {
     return json(401, { error: "Unauthorized" });
   }
 
+  // 대량 배열(estimate-bulk, set-bid-bulk)은 URL 길이 제한을 피하려고 POST 본문으로 받습니다.
+  let parsedBody = null;
+  if (event.body) {
+    try {
+      const raw = event.isBase64Encoded ? Buffer.from(event.body, "base64").toString("utf8") : event.body;
+      parsedBody = JSON.parse(raw);
+    } catch (e) {
+      return json(400, { error: "요청 본문(JSON) 파싱 실패: " + String(e.message || e) });
+    }
+  }
+
   try {
     switch (q.action) {
       case "campaigns": {
@@ -141,23 +152,33 @@ exports.handler = async (event) => {
       }
 
       // 한 번에 최대 200개 키워드까지 순위별 예상 입찰가를 조회합니다 (네이버 API 자체 제한).
-      // ?action=estimate-bulk&type=id&position=3&device=PC&keysB64=(["nkw-...","nkw-..."]를 base64)
-      // type=id면 keysB64 안의 값은 nccKeywordId, type=keyword면 키워드 텍스트입니다.
+      // 최대 200개 키워드까지 순위별 예상 입찰가를 한 번에 조회합니다 (네이버 API 자체 제한).
+      // URL 길이 제한을 피하려고 keys 배열은 POST 요청 본문(JSON)으로 받습니다:
+      //   POST ?action=estimate-bulk&type=id&position=3&device=PC
+      //   body: {"keys": ["nkw-...", "nkw-...", ...]}   (최대 200개)
+      // type=id면 keys 안의 값은 nccKeywordId, type=keyword면 키워드 텍스트입니다.
+      // (레거시: GET + keysB64=base64(JSON배열) 쿼리파라미터도 계속 지원합니다.)
       case "estimate-bulk": {
-        if (!q.type || !q.position || !q.keysB64) {
-          return json(400, { error: "type(id|keyword), position, keysB64 파라미터가 필요합니다" });
+        if (!q.type || !q.position) {
+          return json(400, { error: "type(id|keyword), position 파라미터가 필요합니다" });
         }
         if (!["id", "keyword"].includes(q.type)) {
           return json(400, { error: "type은 id 또는 keyword여야 합니다" });
         }
         let keys;
-        try {
-          keys = JSON.parse(Buffer.from(q.keysB64, "base64").toString("utf8"));
-        } catch (e) {
-          return json(400, { error: "keysB64 디코딩 실패: " + String(e.message || e) });
+        if (parsedBody && Array.isArray(parsedBody.keys)) {
+          keys = parsedBody.keys;
+        } else if (q.keysB64) {
+          try {
+            keys = JSON.parse(Buffer.from(q.keysB64, "base64").toString("utf8"));
+          } catch (e) {
+            return json(400, { error: "keysB64 디코딩 실패: " + String(e.message || e) });
+          }
+        } else {
+          return json(400, { error: "POST 본문의 keys 배열 또는 keysB64 파라미터가 필요합니다" });
         }
         if (!Array.isArray(keys) || !keys.length) {
-          return json(400, { error: "keysB64는 비어있지 않은 배열이어야 합니다" });
+          return json(400, { error: "keys는 비어있지 않은 배열이어야 합니다" });
         }
         if (keys.length > 200) {
           return json(400, { error: "한 번에 최대 200개까지만 가능합니다 (네이버 API 제한)" });
@@ -169,18 +190,26 @@ exports.handler = async (event) => {
         return json(200, result);
       }
 
-      // 한 번에 최대 200개 키워드까지 입찰가를 일괄 변경합니다 (네이버 API 자체 제한).
-      // ?action=set-bid-bulk&itemsB64=([{"nccKeywordId":"nkw-...","bidAmt":650}, ...]를 base64)
+      // 최대 200개 키워드까지 입찰가를 한 번에 변경합니다 (네이버 API 자체 제한).
+      // URL 길이 제한을 피하려고 items 배열은 POST 요청 본문(JSON)으로 받습니다:
+      //   POST ?action=set-bid-bulk
+      //   body: {"items": [{"nccKeywordId":"nkw-...","bidAmt":650}, ...]}   (최대 200개)
+      // (레거시: GET + itemsB64=base64(JSON배열) 쿼리파라미터도 계속 지원합니다.)
       case "set-bid-bulk": {
-        if (!q.itemsB64) return json(400, { error: "itemsB64 파라미터가 필요합니다" });
         let items;
-        try {
-          items = JSON.parse(Buffer.from(q.itemsB64, "base64").toString("utf8"));
-        } catch (e) {
-          return json(400, { error: "itemsB64 디코딩 실패: " + String(e.message || e) });
+        if (parsedBody && Array.isArray(parsedBody.items)) {
+          items = parsedBody.items;
+        } else if (q.itemsB64) {
+          try {
+            items = JSON.parse(Buffer.from(q.itemsB64, "base64").toString("utf8"));
+          } catch (e) {
+            return json(400, { error: "itemsB64 디코딩 실패: " + String(e.message || e) });
+          }
+        } else {
+          return json(400, { error: "POST 본문의 items 배열 또는 itemsB64 파라미터가 필요합니다" });
         }
         if (!Array.isArray(items) || !items.length) {
-          return json(400, { error: "itemsB64는 비어있지 않은 배열이어야 합니다" });
+          return json(400, { error: "items는 비어있지 않은 배열이어야 합니다" });
         }
         if (items.length > 200) {
           return json(400, { error: "한 번에 최대 200개까지만 가능합니다 (네이버 API 제한)" });
