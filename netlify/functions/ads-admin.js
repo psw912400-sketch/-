@@ -17,20 +17,20 @@
 //     → 최대 200개 키워드(id 또는 keyword 텍스트)의 순위별 예상 입찰가를 한 번에 조회
 //   ?action=set-bid-bulk&itemsB64=...
 //     → 최대 200개 키워드의 입찰가를 한 번에 변경 ([{nccKeywordId,bidAmt}] 배열을 base64)
-//   ?action=schedule&ownerId=...
-//     → 캠페인/광고그룹의 현재 요일·시간 타겟팅 설정 조회 (TIME_WEEKLY_TARGET)
-//   ?action=set-schedule&ownerId=...&days=MON,TUE,WED,THU,FRI&startHour=9&endHour=18
-//     → 요일·시간 타겟팅 설정 (startHour~endHour 시간대만 노출, endHour는 미포함:
-//        예) startHour=9&endHour=18 => 09시~17시59분까지 노출)
+//   (요일·시간/지역 타겟팅은 2022년 네이버 API 개편으로 Criterion 방식으로 동작합니다)
+//   ?action=criterion-dictionary&type=RL|SD
+//     → 타게팅 코드 사전 조회 (RL=지역, SD=요일·시간)
+//   ?action=schedule&ownerId=... / ?action=region&ownerId=...
+//     → 광고그룹의 현재 요일·시간 / 지역 타겟팅 설정 조회
 //   ?action=set-schedule&ownerId=...&days=MON,TUE,WED,THU,FRI&ranges=9-12,13-18
-//     → 여러 시간대(예: 점심시간 12시~13시 제외) 설정. ranges는 "시작-끝" 구간을
-//        콤마로 나열 (각 구간의 끝 시간은 미포함). startHour/endHour 대신 사용 가능.
-//        ※ 네이버는 요일·시간 타겟팅을 캠페인이 아니라 "광고그룹" 단위로만 지원합니다.
-//        ownerId에 캠페인 ID(cmp-...)를 넣으면 그 캠페인 산하 모든 광고그룹에
-//        자동으로 같은 설정을 적용합니다. 광고그룹 ID(grp-...)를 넣으면 그 그룹에만 적용됩니다.
+//     → 요일·시간 타겟팅 설정 (여러 시간대를 콤마로 나열, 예: 점심시간 제외)
+//   ?action=set-region&ownerId=...&codes=RL09,RL02,RL11
+//     → 지역 타겟팅 설정 (코드는 criterion-dictionary?type=RL 조회 결과 사용,
+//        예: RL09=서울특별시, RL02=경기도, RL11=인천광역시)
+//        ※ set-schedule, set-region 모두 ownerId에 캠페인 ID(cmp-...)를 넣으면
+//        그 캠페인 산하 모든 광고그룹에 자동으로 같은 설정을 적용합니다.
+//        광고그룹 ID(grp-...)를 넣으면 그 그룹에만 적용됩니다.
 const { request } = require("./lib/naver-api");
-
-const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 function json(statusCode, body) {
   return {
@@ -38,31 +38,6 @@ function json(statusCode, body) {
     headers: { "Content-Type": "application/json; charset=utf-8" },
     body: JSON.stringify(body, null, 2),
   };
-}
-
-// startHour(포함) ~ endHour(미포함) 사이의 시간대만 켜진 24비트 마스크를 만듭니다.
-// 비트 순서: bit 0 = 0시, bit 23 = 23시 (네이버 공식 예시로 확인된 순서).
-function buildHourMask(startHour, endHour) {
-  let mask = 0;
-  for (let h = startHour; h < endHour; h++) {
-    mask += Math.pow(2, h);
-  }
-  return mask;
-}
-
-// "9-12,13-18" 같은 문자열을 받아 여러 구간을 합친 마스크를 만듭니다
-// (각 구간 끝 시간은 미포함, 예: 9-12 => 9,10,11시).
-function buildHourMaskFromRanges(rangesStr) {
-  let mask = 0;
-  const parts = rangesStr.split(",").map((s) => s.trim()).filter(Boolean);
-  for (const part of parts) {
-    const m = part.match(/^(\d{1,2})-(\d{1,2})$/);
-    if (!m) throw new Error(`ranges 형식이 올바르지 않습니다: "${part}" (예: 9-12,13-18)`);
-    const start = Number(m[1]);
-    const end = Number(m[2]);
-    mask |= buildHourMask(start, end);
-  }
-  return mask;
 }
 
 exports.handler = async (event) => {
@@ -343,98 +318,119 @@ exports.handler = async (event) => {
         }
       }
 
-      case "schedule": {
-        if (!q.ownerId) return json(400, { error: "ownerId 파라미터가 필요합니다 (캠페인 또는 광고그룹 ID)" });
-        const list = await request(
-          "GET",
-          `/ncc/targets?ownerId=${encodeURIComponent(q.ownerId)}&types=TIME_WEEKLY_TARGET`
-        );
-        return json(200, list);
+      // 2022년 네이버 API 개편으로 요일·시간/지역 타겟팅은 예전 targets(TIME_WEEKLY_TARGET) 방식이
+      // 폐기되고 새로운 Criterion 방식(/ncc/criterion, /ncc/criterion-dictionary)으로 이전되었습니다.
+      // 공통 헬퍼: 선택한 dictionaryCode 목록으로 광고그룹의 해당 타입 타겟팅을 "전체 교체"합니다
+      // (PUT 요청 바디에 없는 코드는 자동으로 사용안함 처리됨 - 네이버 API 사양).
+      async function putCriterion(adgroupId, type, dictionaryCodes) {
+        const clean = (v) => (v || "").replace(/\s+/g, "");
+        const customerId = Number(clean(process.env.NAVER_CUSTOMER_ID));
+        const body = dictionaryCodes.map((code) => ({
+          dictionaryCode: code,
+          ownerId: adgroupId,
+          customerId,
+          type,
+          value: null,
+          bidWeight: 100,
+          negative: false,
+          enable: true,
+        }));
+        return request("PUT", `/ncc/criterion/${encodeURIComponent(adgroupId)}/${type}`, body);
       }
 
-      case "set-schedule": {
-        if (!q.ownerId || !q.days || !(q.ranges || (q.startHour && q.endHour))) {
-          return json(400, {
-            error:
-              "ownerId, days(예: MON,TUE) 파라미터와, startHour+endHour 또는 ranges(예: 9-12,13-18) 파라미터가 필요합니다",
-          });
-        }
-        const activeDays = q.days.split(",").map((d) => d.trim().toUpperCase());
-        let mask;
-        try {
-          mask = q.ranges ? buildHourMaskFromRanges(q.ranges) : buildHourMask(Number(q.startHour), Number(q.endHour));
-        } catch (e) {
-          return json(400, { error: String(e.message || e) });
-        }
-
-        const target = {};
-        for (const d of DAYS) {
-          target[d] = activeDays.includes(d) ? mask : 0;
-        }
-
-        // 네이버 API에는 TIME_WEEKLY_TARGET을 "새로 만드는" 엔드포인트가 따로 없습니다
-        // (targets 리소스는 GET/PUT만 있고, 기존 타겟이 있어야 PUT으로 수정 가능).
-        // 그리고 요일·시간 타겟팅은 캠페인이 아니라 "광고그룹" 단위로만 걸 수 있습니다
-        // (캠페인 PUT은 userLock/budget/period만 지원, targetTime은 광고그룹 PUT에만 있음).
-        // 그래서 처음 설정하는 경우엔 광고그룹을 PUT(?fields=targetTime)해서 만들어야 합니다.
-        async function applyToAdgroup(adgroupId) {
-          const existing = await request(
-            "GET",
-            `/ncc/targets?ownerId=${encodeURIComponent(adgroupId)}&types=TIME_WEEKLY_TARGET`
-          );
-          if (existing && existing.length) {
-            const targetId = existing[0].nccTargetId;
-            return {
-              adgroupId,
-              created: false,
-              result: await request("PUT", `/ncc/targets/${encodeURIComponent(targetId)}`, {
-                nccTargetId: targetId,
-                ownerId: adgroupId,
-                targetTp: "TIME_WEEKLY_TARGET",
-                target,
-              }),
-            };
-          }
-          return {
-            adgroupId,
-            created: true,
-            result: await request(
-              "PUT",
-              `/ncc/adgroups/${encodeURIComponent(adgroupId)}?fields=targetTime`,
-              {
-                nccAdgroupId: adgroupId,
-                targets: [{ targetTp: "TIME_WEEKLY_TARGET", target }],
-              }
-            ),
-          };
-        }
-
-        const isCampaign = q.ownerId.startsWith("cmp-");
+      async function forEachAdgroup(ownerId, fn) {
+        const isCampaign = ownerId.startsWith("cmp-");
         if (!isCampaign) {
-          const r = await applyToAdgroup(q.ownerId);
-          return json(200, { appliedMask: mask, activeDays, ...r });
+          return [{ adgroupId: ownerId, result: await fn(ownerId) }];
         }
-
-        // 캠페인 ID가 들어오면, 그 캠페인의 모든 광고그룹에 동일하게 적용합니다.
-        const adgroups = await request(
-          "GET",
-          `/ncc/adgroups?nccCampaignId=${encodeURIComponent(q.ownerId)}`
-        );
+        const adgroups = await request("GET", `/ncc/adgroups?nccCampaignId=${encodeURIComponent(ownerId)}`);
         const results = [];
         for (const g of adgroups) {
           try {
-            results.push(await applyToAdgroup(g.nccAdgroupId));
+            results.push({ adgroupId: g.nccAdgroupId, result: await fn(g.nccAdgroupId) });
           } catch (e) {
             results.push({ adgroupId: g.nccAdgroupId, error: String(e.message || e) });
           }
         }
-        return json(200, {
-          appliedMask: mask,
-          activeDays,
-          campaignId: q.ownerId,
-          adgroupCount: adgroups.length,
-          results,
-        });
+        return results;
+      }
+
+      // 타게팅 코드 사전 조회 (예: 지역 코드, 요일·시간 코드 목록)
+      //   ?action=criterion-dictionary&type=RL (지역) 또는 type=SD (요일/시간)
+      case "criterion-dictionary": {
+        if (!q.type) return json(400, { error: "type 파라미터가 필요합니다 (예: RL, SD)" });
+        const result = await request("GET", `/ncc/criterion-dictionary/${encodeURIComponent(q.type)}`);
+        return json(200, result);
+      }
+
+      // 광고그룹에 현재 설정된 타게팅 조회 (지역/요일시간/성별/연령 등)
+      //   ?action=criterion&adgroupId=grp-...&type=RL
+      case "criterion": {
+        if (!q.adgroupId || !q.type) return json(400, { error: "adgroupId, type 파라미터가 필요합니다" });
+        const result = await request(
+          "GET",
+          `/ncc/criterion/${encodeURIComponent(q.adgroupId)}?type=${encodeURIComponent(q.type)}`
+        );
+        return json(200, result);
+      }
+
+      // 요일·시간 타겟팅 조회 (호환용 - 실제로는 SD 타입 criterion 조회)
+      //   ?action=schedule&ownerId=grp-...
+      case "schedule": {
+        if (!q.ownerId) return json(400, { error: "ownerId 파라미터가 필요합니다" });
+        const list = await request(
+          "GET",
+          `/ncc/criterion/${encodeURIComponent(q.ownerId)}?type=SD`
+        );
+        return json(200, list);
+      }
+
+      // 요일·시간 타겟팅 설정 (Criterion API, SD 타입).
+      //   ?action=set-schedule&ownerId=grp-... 또는 cmp-...&days=MON,TUE,WED,THU,FRI&ranges=9-12,13-18
+      // ownerId에 캠페인 ID를 넣으면 산하 모든 광고그룹에 동일 적용됩니다.
+      // 주의: 지정 안 한 요일은 "종일 노출"로 남습니다 (요일 자체를 끄는 옵션은 해당 요일의
+      // 모든 시간대를 negative:true로 등록해야 하므로, 완전히 끄고 싶은 요일이 있으면 별도 요청하세요).
+      case "set-schedule": {
+        if (!q.ownerId || !q.days || !q.ranges) {
+          return json(400, {
+            error: "ownerId, days(예: MON,TUE) 와 ranges(예: 9-12,13-18) 파라미터가 필요합니다",
+          });
+        }
+        const activeDays = q.days.split(",").map((d) => d.trim().toUpperCase());
+        const ranges = q.ranges.split(",").map((s) => s.trim());
+        const codes = [];
+        for (const day of activeDays) {
+          for (const r of ranges) {
+            const m = r.match(/^(\d{1,2})-(\d{1,2})$/);
+            if (!m) return json(400, { error: `ranges 형식이 올바르지 않습니다: "${r}" (예: 9-12,13-18)` });
+            const start = m[1].padStart(2, "0");
+            const end = m[2].padStart(2, "0");
+            codes.push(`SD${day}${start}${end}`);
+          }
+        }
+        const results = await forEachAdgroup(q.ownerId, (adgroupId) => putCriterion(adgroupId, "SD", codes));
+        return json(200, { codes, activeDays, ranges, results });
+      }
+
+      // 지역 타겟팅 조회 (호환용 - RL 타입 criterion 조회)
+      case "region": {
+        if (!q.ownerId) return json(400, { error: "ownerId 파라미터가 필요합니다" });
+        const list = await request("GET", `/ncc/criterion/${encodeURIComponent(q.ownerId)}?type=RL`);
+        return json(200, list);
+      }
+
+      // 지역 타겟팅 설정 (Criterion API, RL 타입).
+      //   ?action=set-region&ownerId=grp-... 또는 cmp-...&codes=RL09,RL02,RL11
+      // 코드는 criterion-dictionary?type=RL 조회 결과의 dictionaryCode를 사용합니다.
+      // (예: RL09=서울특별시, RL02=경기도, RL11=인천광역시 - 시/도 단위)
+      // ownerId에 캠페인 ID를 넣으면 산하 모든 광고그룹에 동일 적용됩니다.
+      case "set-region": {
+        if (!q.ownerId || !q.codes) {
+          return json(400, { error: "ownerId, codes(예: RL09,RL02,RL11) 파라미터가 필요합니다" });
+        }
+        const codes = q.codes.split(",").map((c) => c.trim());
+        const results = await forEachAdgroup(q.ownerId, (adgroupId) => putCriterion(adgroupId, "RL", codes));
+        return json(200, { codes, results });
       }
 
       case "adgroup-targets": {
@@ -526,6 +522,10 @@ exports.handler = async (event) => {
             "stats",
             "schedule",
             "set-schedule",
+            "region",
+            "set-region",
+            "criterion",
+            "criterion-dictionary",
             "adgroup-targets",
             "estimate-bulk",
             "set-bid-bulk",
