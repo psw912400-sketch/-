@@ -317,6 +317,18 @@ exports.handler = async (event) => {
         }
       }
 
+      // 디버그/탐색용: 임의의 GET 요청 (path에 쿼리스트링 포함 가능).
+      //   ?action=raw-get&path=/ncc/criterion-dictionary/RL
+      case "raw-get": {
+        if (!q.path) return json(400, { error: "path 파라미터가 필요합니다" });
+        try {
+          const result = await request("GET", q.path);
+          return json(200, result);
+        } catch (e) {
+          return json(200, { error: String(e.message || e) });
+        }
+      }
+
       // 디버그/탐색용: 임의의 PUT 요청을 보냅니다 (지역 타겟팅 필드명을 확인하기 위함).
       //   ?action=raw-put&path=/ncc/adgroups/grp-...&fields=region
       //   POST body: 실제로 보낼 JSON
