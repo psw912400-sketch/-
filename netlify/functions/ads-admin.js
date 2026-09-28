@@ -469,10 +469,11 @@ exports.handler = async (event) => {
         }
         const result = await request(
           "PUT",
-          `/ncc/ad-extensions/${encodeURIComponent(q.adExtensionId)}?fields=adExtension`,
+          `/ncc/ad-extensions/${encodeURIComponent(q.adExtensionId)}?fields=adExtension,userLock`,
           {
             nccAdExtensionId: q.adExtensionId,
             adExtension: parsedBody.adExtension,
+            userLock: false,
           }
         );
         return json(200, result);
