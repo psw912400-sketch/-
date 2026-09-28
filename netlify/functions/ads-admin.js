@@ -458,6 +458,26 @@ exports.handler = async (event) => {
         return json(200, { results });
       }
 
+      // 기존 확장소재의 텍스트 내용만 수정합니다 (헤드라인/설명/부가설명 등).
+      //   ?action=update-ad-extension&adExtensionId=ext-...
+      //   POST body: {"adExtension": {"headline": "..."}} 또는 {"description": "..."} 등
+      //   (type에 맞는 필드만 넣으면 됩니다. 예: DESCRIPTION → {"description":"..."})
+      case "update-ad-extension": {
+        if (!q.adExtensionId) return json(400, { error: "adExtensionId 파라미터가 필요합니다" });
+        if (!parsedBody || !parsedBody.adExtension) {
+          return json(400, { error: "POST 본문에 adExtension 객체가 필요합니다" });
+        }
+        const result = await request(
+          "PUT",
+          `/ncc/ad-extensions/${encodeURIComponent(q.adExtensionId)}?fields=adExtension`,
+          {
+            nccAdExtensionId: q.adExtensionId,
+            adExtension: parsedBody.adExtension,
+          }
+        );
+        return json(200, result);
+      }
+
       default:
         return json(400, {
           error: "알 수 없는 action입니다.",
@@ -477,6 +497,7 @@ exports.handler = async (event) => {
             "channels",
             "ad-extensions",
             "create-ad-extensions",
+            "update-ad-extension",
           ],
         });
     }
