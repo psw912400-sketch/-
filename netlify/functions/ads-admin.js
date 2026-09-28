@@ -304,6 +304,19 @@ exports.handler = async (event) => {
         }
       }
 
+      // 디버그/탐색용: 임의의 targetTp로 /ncc/targets 조회 (지역 타겟팅 타입명을 확인하기 위함)
+      //   ?action=raw-targets&ownerId=grp-...&types=REGION
+      case "raw-targets": {
+        if (!q.ownerId) return json(400, { error: "ownerId 파라미터가 필요합니다" });
+        const typesParam = q.types ? `&types=${encodeURIComponent(q.types)}` : "";
+        try {
+          const list = await request("GET", `/ncc/targets?ownerId=${encodeURIComponent(q.ownerId)}${typesParam}`);
+          return json(200, list);
+        } catch (e) {
+          return json(200, { error: String(e.message || e) });
+        }
+      }
+
       case "schedule": {
         if (!q.ownerId) return json(400, { error: "ownerId 파라미터가 필요합니다 (캠페인 또는 광고그룹 ID)" });
         const list = await request(
