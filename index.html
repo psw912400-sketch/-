@@ -1487,9 +1487,9 @@
       ts: Date.now()
     });
     if (navigator.sendBeacon) {
-      navigator.sendBeacon('/.netlify/functions/log-visit', new Blob([payload], { type: 'application/json' }));
+      navigator.sendBeacon('https://chimerical-mandazi-8f1c1f.netlify.app/.netlify/functions/log-visit', new Blob([payload], { type: 'application/json' }));
     } else {
-      fetch('/.netlify/functions/log-visit', { method: 'POST', body: payload, keepalive: true });
+      fetch('https://chimerical-mandazi-8f1c1f.netlify.app/.netlify/functions/log-visit', { method: 'POST', body: payload, keepalive: true, mode: 'cors' });
     }
   } catch (e) {}
 })();
