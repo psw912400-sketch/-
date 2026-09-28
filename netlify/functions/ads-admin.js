@@ -130,6 +130,34 @@ exports.handler = async (event) => {
         return json(200, list);
       }
 
+      // 광고그룹에 기본 광고(반응형 검색광고, RSA_AD)를 새로 만듭니다.
+      // POST 본문: {"nccAdgroupId":"grp-...","finalUrl":"https://...","headlines":["...", ...],"descriptions":["...", ...]}
+      case "create-ad": {
+        if (!parsedBody || !parsedBody.nccAdgroupId || !parsedBody.finalUrl) {
+          return json(400, { error: "POST 본문에 nccAdgroupId, finalUrl이 필요합니다" });
+        }
+        const headlines = Array.isArray(parsedBody.headlines) ? parsedBody.headlines : [];
+        const descriptions = Array.isArray(parsedBody.descriptions) ? parsedBody.descriptions : [];
+        if (!headlines.length || !descriptions.length) {
+          return json(400, { error: "headlines, descriptions 배열이 각각 최소 1개 이상 필요합니다" });
+        }
+        const assets = [
+          ...headlines.map((text) => ({ assetType: "TEXT", assetData: { text }, linkType: "HEADLINE" })),
+          ...descriptions.map((text) => ({ assetType: "TEXT", assetData: { text }, linkType: "DESCRIPTION" })),
+        ];
+        const body = {
+          nccAdgroupId: parsedBody.nccAdgroupId,
+          type: "RSA_AD",
+          ad: {
+            pc: { final: parsedBody.finalUrl },
+            mobile: { final: parsedBody.finalUrl },
+          },
+          assets,
+        };
+        const result = await request("POST", "/ncc/ads", body);
+        return json(200, result);
+      }
+
       case "estimate": {
         if (!q.keyword || !q.position) {
           return json(400, { error: "keyword, position 파라미터가 필요합니다" });
