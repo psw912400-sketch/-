@@ -123,6 +123,13 @@ exports.handler = async (event) => {
         );
       }
 
+      // 광고그룹의 실제 소재(제목/설명/URL) 목록 조회 - 파워링크 미리보기용
+      case "ads": {
+        if (!q.adgroupId) return json(400, { error: "adgroupId 파라미터가 필요합니다" });
+        const list = await request("GET", `/ncc/ads?nccAdgroupId=${encodeURIComponent(q.adgroupId)}`);
+        return json(200, list);
+      }
+
       case "estimate": {
         if (!q.keyword || !q.position) {
           return json(400, { error: "keyword, position 파라미터가 필요합니다" });
@@ -419,6 +426,7 @@ exports.handler = async (event) => {
             "campaigns",
             "adgroups",
             "keywords",
+            "ads",
             "estimate",
             "set-bid",
             "stats",
