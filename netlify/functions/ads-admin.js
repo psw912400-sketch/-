@@ -67,6 +67,17 @@ exports.handler = async (event) => {
         );
       }
 
+      // 캠페인 전체를 켜고/끕니다 (userLock). 광고를 잠시 전체 중지하고 싶을 때 사용.
+      //   ?action=set-campaign-lock&campaignId=cmp-...&lock=true (중지) 또는 lock=false (재개)
+      case "set-campaign-lock": {
+        if (!q.campaignId || !q.lock) return json(400, { error: "campaignId, lock(true/false) 파라미터가 필요합니다" });
+        const result = await request("PUT", `/ncc/campaigns/${encodeURIComponent(q.campaignId)}?fields=userLock`, {
+          nccCampaignId: q.campaignId,
+          userLock: q.lock === "true",
+        });
+        return json(200, result);
+      }
+
       case "adgroups": {
         if (!q.campaignId) return json(400, { error: "campaignId 파라미터가 필요합니다" });
         const list = await request("GET", `/ncc/adgroups?nccCampaignId=${encodeURIComponent(q.campaignId)}`);
@@ -533,6 +544,7 @@ exports.handler = async (event) => {
             "ad-extensions",
             "create-ad-extensions",
             "pause-ad-extension",
+            "set-campaign-lock",
           ],
         });
     }
