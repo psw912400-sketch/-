@@ -1,9 +1,6 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>올바른종합환경 | B2B 건물위생관리 · 청소 전문</title>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YND70V71SE"></script>
 <script>
@@ -12,6 +9,14 @@
   gtag('js', new Date());
   gtag('config', 'G-YND70V71SE');
 </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="images/favicon-48.png">
+<link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="images/favicon-180.png">
+<title>올바른종합환경 | B2B 건물위생관리 · 청소 전문</title>
 <meta name="description" content="에어컨 클리닝, 바닥 왁스, 카페트 청소, 사무실 청소부터 정기 계약까지. 건물위생관리업 정식 등록, 하도급 없이 직접 시공하는 올바른종합환경.">
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" as="style" crossorigin
@@ -165,11 +170,14 @@
   }
   .hero-media{width:100%;margin-top:40px;}
   .hero-slideshow{position:relative;width:100%;height:min(72vh,640px);overflow:hidden;}
-  .hero-slideshow img{
-    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  .hero-slide{
+    position:absolute;inset:0;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:3px;
+    background:var(--navy-dark);
     opacity:0;transition:opacity 1.4s ease;
   }
-  .hero-slideshow img.active{opacity:1;}
+  .hero-slide.active{opacity:1;}
+  .hero-slide img{width:100%;height:100%;object-fit:cover;display:block;}
 
   /* ---------- Category overview (inside hero) ---------- */
   .cat-grid{
@@ -214,22 +222,6 @@
     margin-top:52px;
     border-radius:24px;
     overflow:hidden;
-  }
-  .area-group{
-    margin-top:36px;
-    text-align:left;
-    padding:20px 24px;
-    background:var(--white);
-    border-radius:16px;
-    border:1px solid var(--divider);
-  }
-  .area-group + .area-group{margin-top:16px;}
-  .area-group h4{
-    font-size:14px;font-weight:700;color:var(--navy);
-    margin:0 0 8px;
-  }
-  .area-group p{
-    margin:0;font-size:13.5px;line-height:1.7;color:var(--gray-500);
   }
   .feature-media img{width:100%;height:520px;object-fit:cover;}
   .feature-media.split{
@@ -305,6 +297,30 @@
   }
   .care-card li::before{
     content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--navy);
+  }
+
+  /* ---------- Case study (시공사례) grid ---------- */
+  .case-grid{
+    margin-top:52px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:28px;
+  }
+  .case-card{
+    background:var(--white);border:1px solid var(--divider);border-radius:20px;
+    overflow:hidden;text-align:left;
+    transition:box-shadow .15s ease, transform .15s ease;
+  }
+  .case-card:hover{box-shadow:0 14px 32px rgba(15,42,74,.14);transform:translateY(-3px);}
+  .case-photo{aspect-ratio:4/3;overflow:hidden;background:var(--gray-100);}
+  .case-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .case-body{padding:22px 24px 26px;}
+  .case-tag{
+    display:inline-block;font-size:12px;font-weight:700;color:var(--navy);
+    background:#EEF2F8;padding:5px 12px;border-radius:980px;margin-bottom:12px;
+  }
+  .case-body h3{font-size:18px;font-weight:700;letter-spacing:-.01em;}
+  .case-body .case-year{margin-top:6px;font-size:13.5px;color:var(--gray-500);}
+  .case-note{
+    margin-top:36px;font-size:14px;color:var(--gray-500);text-align:center;
   }
 
   /* ---------- Floating booking CTA ---------- */
@@ -491,6 +507,7 @@
     .feature-media.split{grid-template-columns:1fr;}
     .feature-media.split.triple{grid-template-columns:1fr;}
     .care-grid{grid-template-columns:1fr;}
+    .case-grid{grid-template-columns:repeat(2,1fr);}
     .stat-grid{grid-template-columns:repeat(2,1fr);row-gap:32px;}
     .stat-item:nth-child(3){border-left:none;}
     .booking-grid{grid-template-columns:1fr;}
@@ -499,7 +516,10 @@
     .form-grid{grid-template-columns:1fr;}
     .check-grid{grid-template-columns:1fr;}
     .hero-slideshow{height:340px;}
+    .hero-slide{grid-template-columns:repeat(2,1fr);}
+    .hero-slide img:nth-child(3){display:none;}
     .feature-media img{height:320px;}
+    .case-grid{grid-template-columns:1fr;}
     form.booking-form{padding:26px;}
     .booking-modal-panel{padding:22px;}
   }
@@ -526,6 +546,7 @@
       </div>
       <a href="#why">회사소개</a>
       <a href="https://blog.naver.com/pink123bird" target="_blank" rel="noopener noreferrer">블로그</a>
+      <a href="#portfolio">시공사례</a>
       <a href="#booking" class="js-open-booking">예약문의</a>
     </div>
     <div class="nav-cta">
@@ -555,6 +576,7 @@
     </div>
     <a href="#why" style="color:#fff;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);">회사소개</a>
     <a href="https://blog.naver.com/pink123bird" target="_blank" rel="noopener noreferrer" style="color:#fff;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);">블로그</a>
+    <a href="#portfolio" style="color:#fff;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);">시공사례</a>
     <a href="#booking" class="js-open-booking" style="color:#fff;padding:12px 0;">예약문의</a>
     <a href="tel:010-4705-7970" style="color:var(--yellow);padding:12px 0 0;font-weight:700;">전화 문의 010-4705-7970</a>
   </div>
@@ -591,13 +613,41 @@
   </div>
   <div class="hero-media">
     <div class="hero-slideshow" id="heroSlideshow">
-      <img src="images/ac-covering.jpg" alt="에어컨 세척" class="active">
-      <img src="images/floor-wax-during.jpg" alt="바닥 왁스 작업">
-      <img src="images/carpet-wand.jpg" alt="카페트 세척">
-      <img src="images/office-wide.jpg" alt="사무실 청소">
-      <img src="images/school-lobby.jpg" alt="학교 청소">
-      <img src="images/hood-pressure-wash.jpg" alt="학교 급식실 후드 청소">
-      <img src="images/chair-sofa-wash.jpg" alt="사무실 의자 청소">
+      <div class="hero-slide active">
+        <img src="images/ac-covering.jpg" alt="에어컨 분해·보양 작업">
+        <img src="images/ac-disassembly.jpg" alt="에어컨 부품별 분리 세척">
+        <img src="images/ac-reassembly.jpg" alt="에어컨 재조립·점검">
+      </div>
+      <div class="hero-slide">
+        <img src="images/floor-wax-before.jpg" alt="바닥 왁스 작업 전 오염 확인">
+        <img src="images/floor-wax-during.jpg" alt="바닥 왁스 작업 중">
+        <img src="images/floor-wax-after.jpg" alt="바닥 왁스 시공 완료">
+      </div>
+      <div class="hero-slide">
+        <img src="images/carpet-wand.jpg" alt="카페트 습식 추출 세척">
+        <img src="images/carpet-contrast.jpg" alt="카페트 세척 전후 비교">
+        <img src="images/carpet-finished.jpg" alt="카페트 세척 완료">
+      </div>
+      <div class="hero-slide">
+        <img src="images/office-floor.jpg" alt="사무실 바닥 관리">
+        <img src="images/office-detail.jpg" alt="사무실 구석구석 청소">
+        <img src="images/office-wide.jpg" alt="사무실 공간 전체 관리">
+      </div>
+      <div class="hero-slide">
+        <img src="images/school-rail.jpg" alt="학교 창틀·난간 세척">
+        <img src="images/school-lobby.jpg" alt="학교 로비·복도 관리">
+        <img src="images/school-hallway.jpg" alt="학교 복도 시공 완료">
+      </div>
+      <div class="hero-slide">
+        <img src="images/hood-detergent.jpg" alt="학교 급식실 후드 세제 도포">
+        <img src="images/hood-pressure-wash.jpg" alt="학교 급식실 후드 고압 세척">
+        <img src="images/hood-filter.jpg" alt="학교 급식실 후드 필터 세척">
+      </div>
+      <div class="hero-slide">
+        <img src="images/chair-mesh-wash.jpg" alt="사무실 의자 메쉬 원단 세척">
+        <img src="images/chair-sofa-wash.jpg" alt="패브릭 소파 세척">
+        <img src="images/chair-team-wide.jpg" alt="다수 의자 동시 작업">
+      </div>
     </div>
   </div>
 </section>
@@ -619,7 +669,7 @@
         <figcaption class="media-caption">부품별 분리 세척</figcaption>
       </figure>
       <figure>
-        <img src="images/ac-reassembly.jpg" alt="세척 후 에어컨 내부 기판을 점검하며 재조립하는 모습">
+        <img src="images/ac-reassembly.jpg" alt="세척 후 에어컨 내부를 꼼꼼히 점검하며 재조립하는 모습">
         <figcaption class="media-caption">재조립·점검</figcaption>
       </figure>
     </div>
@@ -736,7 +786,7 @@
         <figcaption class="media-caption">바닥 관리</figcaption>
       </figure>
       <figure>
-        <img src="images/office-detail.jpg" alt="책상 밑 구석까지 청소하는 모습">
+        <img src="images/office-detail.jpg" alt="사무실 책장 주변 바닥까지 꼼꼼히 청소하는 모습">
         <figcaption class="media-caption">구석구석 청소</figcaption>
       </figure>
       <figure>
@@ -930,6 +980,89 @@
         <div class="label">학교·공공기관<br>시공 실적</div>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="feature" id="portfolio">
+  <div class="wrap">
+    <div class="feature-copy reveal">
+      <div class="eyebrow">시공사례</div>
+      <h2>학교·공공기관에서<br>확인된 시공 실적입니다.</h2>
+      <p>재하청 없이 자사 인력으로 직접 시공한 주요 현장입니다. 아래 목록 외에도 다수의 사무실·매장 시공 사례가 있습니다.</p>
+    </div>
+    <div class="case-grid reveal">
+      <div class="case-card">
+        <div class="case-photo">
+          <img src="images/school-hallway.jpg" alt="용인 손곡중학교 겨울방학 대청소 후 광택이 도는 복도">
+        </div>
+        <div class="case-body">
+          <span class="case-tag">학교 대청소</span>
+          <h3>용인 손곡중학교</h3>
+          <p class="case-year">2023·2024·2025 겨울방학</p>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-photo">
+          <img src="images/school-rail.jpg" alt="광명 광남중학교 교실 창틀·난간 세척 작업">
+        </div>
+        <div class="case-body">
+          <span class="case-tag">학교 대청소</span>
+          <h3>광명 광남중학교</h3>
+          <p class="case-year">2025</p>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-photo">
+          <img src="images/carpet-finished.jpg" alt="세종과학고 기숙사 카페트 청소가 완료된 공용 공간">
+        </div>
+        <div class="case-body">
+          <span class="case-tag">기숙사 청소</span>
+          <h3>서울 세종과학고 기숙사</h3>
+          <p class="case-year">2025</p>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-photo">
+          <img src="images/school-lobby.jpg" alt="구리 장자초등학교 로비를 자동 세척기로 관리하는 모습">
+        </div>
+        <div class="case-body">
+          <span class="case-tag">학교 청소</span>
+          <h3>구리 장자초등학교</h3>
+          <p class="case-year">2025</p>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-photo">
+          <img src="images/ac-reassembly.jpg" alt="동양미래대학교 냉난방기 세척 후 점검하는 모습">
+        </div>
+        <div class="case-body">
+          <span class="case-tag">냉난방기 종합 세척</span>
+          <h3>서울 동양미래대학교</h3>
+          <p class="case-year">2026</p>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-photo">
+          <img src="images/office-detail.jpg" alt="등원초등학교 도서관 서가 주변을 꼼꼼히 청소하는 모습">
+        </div>
+        <div class="case-body">
+          <span class="case-tag">도서관 청소</span>
+          <h3>서울 등원초등학교</h3>
+          <p class="case-year">2026</p>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-photo">
+          <img src="images/hood-pressure-wash.jpg" alt="인천 관내 학교 급식실 후드 고압 세척 작업">
+        </div>
+        <div class="case-body">
+          <span class="case-tag">급식실 후드 청소</span>
+          <h3>인천 관내 초·중·고 급식실</h3>
+          <p class="case-year">2025 · 다수 현장</p>
+        </div>
+      </div>
+    </div>
+    <p class="case-note">공공기관·학교 시공 문의는 나라장터·S2B 학교장터 등록 업체로도 진행 가능합니다.</p>
   </div>
 </section>
 
@@ -1131,6 +1264,18 @@
     a.addEventListener('click', function(){ mobileNav.style.display = 'none'; });
   });
 
+  // Phone click tracking
+  document.querySelectorAll('a[href^="tel:"]').forEach(function(el){
+    el.addEventListener('click', function(){
+      if (typeof gtag === 'function') {
+        gtag('event', 'phone_click', {
+          'event_category': 'engagement',
+          'event_label': '전화 연결'
+        });
+      }
+    });
+  });
+
   var recurringCheck = document.getElementById('recurringCheck');
   var freqField = document.getElementById('freqField');
   recurringCheck.addEventListener('change', function(){
@@ -1234,7 +1379,7 @@
   // Hero slideshow (cycles through all services)
   var heroSlideshow = document.getElementById('heroSlideshow');
   if(heroSlideshow){
-    var slides = heroSlideshow.querySelectorAll('img');
+    var slides = heroSlideshow.querySelectorAll('.hero-slide');
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(slides.length > 1 && !reduceMotion){
       var current = 0;
@@ -1307,6 +1452,12 @@
       if(result.ok){
         statusBox.textContent = '신청이 접수되었습니다. 확인 후 빠르게 연락드리겠습니다.';
         statusBox.className = 'form-status show ok';
+        if (typeof gtag === 'function') {
+          gtag('event', 'booking_submit', {
+            'event_category': 'engagement',
+            'event_label': '예약 신청 완료'
+          });
+        }
         form.reset();
         freqField.classList.remove('show');
       } else {
