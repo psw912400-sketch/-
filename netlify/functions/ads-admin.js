@@ -458,39 +458,17 @@ exports.handler = async (event) => {
         return json(200, { results });
       }
 
-      // 기존 확장소재의 텍스트 내용만 수정합니다 (헤드라인/설명/부가설명 등).
-      //   ?action=update-ad-extension&adExtensionId=ext-...
-      //   POST body: {"adExtension": {"headline": "..."}} 또는 {"description": "..."} 등
-      //   (type에 맞는 필드만 넣으면 됩니다. 예: DESCRIPTION → {"description":"..."})
-      case "update-ad-extension": {
+      // 확장소재는 내용(adExtension) 자체는 수정이 안 되고(네이버 API 제약, 실측 확인됨),
+      // userLock(끄기/켜기)만 변경 가능합니다. 내용을 바꾸려면 새로 만들고 기존 것은 꺼야 합니다.
+      //   ?action=pause-ad-extension&adExtensionId=ext-...
+      case "pause-ad-extension": {
         if (!q.adExtensionId) return json(400, { error: "adExtensionId 파라미터가 필요합니다" });
-        if (!parsedBody || !parsedBody.adExtension) {
-          return json(400, { error: "POST 본문에 adExtension 객체가 필요합니다" });
-        }
-        // 기존 항목 전체를 먼저 조회해서 ownerId/type/채널 등을 그대로 유지한 채
-        // adExtension 내용만 교체한 완전한 객체로 PUT 합니다 (부분 필드만 보내면
-        // 네이버 API가 조용히 무시하는 것으로 확인됨).
-        const existing = await request(
-          "GET",
-          `/ncc/ad-extensions?ownerId=${encodeURIComponent(q.ownerId || "")}`
-        );
-        const current = Array.isArray(existing)
-          ? existing.find((e) => e.nccAdExtensionId === q.adExtensionId)
-          : null;
-        if (!current) {
-          return json(404, { error: "해당 adExtensionId를 ownerId 하위에서 찾을 수 없습니다 (ownerId 파라미터 필요)" });
-        }
         const result = await request(
           "PUT",
-          `/ncc/ad-extensions/${encodeURIComponent(q.adExtensionId)}?fields=adExtension,userLock,pcChannelId,mobileChannelId`,
+          `/ncc/ad-extensions/${encodeURIComponent(q.adExtensionId)}?fields=userLock`,
           {
             nccAdExtensionId: q.adExtensionId,
-            ownerId: current.ownerId,
-            type: current.type,
-            pcChannelId: current.pcChannelId,
-            mobileChannelId: current.mobileChannelId,
-            adExtension: parsedBody.adExtension,
-            userLock: false,
+            userLock: true,
           }
         );
         return json(200, result);
@@ -515,7 +493,7 @@ exports.handler = async (event) => {
             "channels",
             "ad-extensions",
             "create-ad-extensions",
-            "update-ad-extension",
+            "pause-ad-extension",
           ],
         });
     }
