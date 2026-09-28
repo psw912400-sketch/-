@@ -158,6 +158,17 @@ exports.handler = async (event) => {
         return json(200, result);
       }
 
+      // 특정 광고(소재)를 잠궈서(userLock) 노출을 멈춥니다 - 오래된/일괄 등록된 광고 정리용.
+      // ?action=pause-ad&adId=nad-...
+      case "pause-ad": {
+        if (!q.adId) return json(400, { error: "adId 파라미터가 필요합니다" });
+        const result = await request("PUT", `/ncc/ads/${encodeURIComponent(q.adId)}?fields=userLock`, {
+          nccAdId: q.adId,
+          userLock: true,
+        });
+        return json(200, result);
+      }
+
       case "estimate": {
         if (!q.keyword || !q.position) {
           return json(400, { error: "keyword, position 파라미터가 필요합니다" });
