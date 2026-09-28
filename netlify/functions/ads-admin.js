@@ -317,6 +317,20 @@ exports.handler = async (event) => {
         }
       }
 
+      // 디버그/탐색용: 임의의 PUT 요청을 보냅니다 (지역 타겟팅 필드명을 확인하기 위함).
+      //   ?action=raw-put&path=/ncc/adgroups/grp-...&fields=region
+      //   POST body: 실제로 보낼 JSON
+      case "raw-put": {
+        if (!q.path) return json(400, { error: "path 파라미터가 필요합니다" });
+        const fieldsQ = q.fields ? `?fields=${encodeURIComponent(q.fields)}` : "";
+        try {
+          const result = await request("PUT", `${q.path}${fieldsQ}`, parsedBody || {});
+          return json(200, result);
+        } catch (e) {
+          return json(200, { error: String(e.message || e) });
+        }
+      }
+
       case "schedule": {
         if (!q.ownerId) return json(400, { error: "ownerId 파라미터가 필요합니다 (캠페인 또는 광고그룹 ID)" });
         const list = await request(
