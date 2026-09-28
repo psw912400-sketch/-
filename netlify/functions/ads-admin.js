@@ -467,11 +467,28 @@ exports.handler = async (event) => {
         if (!parsedBody || !parsedBody.adExtension) {
           return json(400, { error: "POST 본문에 adExtension 객체가 필요합니다" });
         }
+        // 기존 항목 전체를 먼저 조회해서 ownerId/type/채널 등을 그대로 유지한 채
+        // adExtension 내용만 교체한 완전한 객체로 PUT 합니다 (부분 필드만 보내면
+        // 네이버 API가 조용히 무시하는 것으로 확인됨).
+        const existing = await request(
+          "GET",
+          `/ncc/ad-extensions?ownerId=${encodeURIComponent(q.ownerId || "")}`
+        );
+        const current = Array.isArray(existing)
+          ? existing.find((e) => e.nccAdExtensionId === q.adExtensionId)
+          : null;
+        if (!current) {
+          return json(404, { error: "해당 adExtensionId를 ownerId 하위에서 찾을 수 없습니다 (ownerId 파라미터 필요)" });
+        }
         const result = await request(
           "PUT",
-          `/ncc/ad-extensions/${encodeURIComponent(q.adExtensionId)}?fields=adExtension,userLock`,
+          `/ncc/ad-extensions/${encodeURIComponent(q.adExtensionId)}?fields=adExtension,userLock,pcChannelId,mobileChannelId`,
           {
             nccAdExtensionId: q.adExtensionId,
+            ownerId: current.ownerId,
+            type: current.type,
+            pcChannelId: current.pcChannelId,
+            mobileChannelId: current.mobileChannelId,
             adExtension: parsedBody.adExtension,
             userLock: false,
           }
