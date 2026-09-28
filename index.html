@@ -215,6 +215,22 @@
     border-radius:24px;
     overflow:hidden;
   }
+  .area-group{
+    margin-top:36px;
+    text-align:left;
+    padding:20px 24px;
+    background:var(--white);
+    border-radius:16px;
+    border:1px solid var(--divider);
+  }
+  .area-group + .area-group{margin-top:16px;}
+  .area-group h4{
+    font-size:14px;font-weight:700;color:var(--navy);
+    margin:0 0 8px;
+  }
+  .area-group p{
+    margin:0;font-size:13.5px;line-height:1.7;color:var(--gray-500);
+  }
   .feature-media img{width:100%;height:520px;object-fit:cover;}
   .feature-media.split{
     display:grid;grid-template-columns:1fr 1fr;gap:16px;
@@ -1037,6 +1053,26 @@
   </div>
 </div>
 
+
+<section class="feature gray service-area" id="service-area">
+  <div class="wrap feature-copy" style="max-width:920px;">
+    <div class="eyebrow">서비스 가능 지역</div>
+    <h2 style="font-size:clamp(24px,3.2vw,34px);">서울·경기·인천 전 지역 출장 서비스</h2>
+    <p>아래 지역을 포함한 인근 지역에서 에어컨 클리닝, 바닥 왁스·청소, 카페트 청소, 사무실 청소, 정기 청소, 학교 청소 서비스를 제공하고 있습니다.</p>
+    <div class="area-group">
+      <h4>서울특별시</h4>
+      <p>가락동, 감일동, 강남, 강남역, 강동, 강북, 강서, 건대, 공덕동, 관악, 광진, 광화문, 교문동, 구로, 구의동, 금천, 길음동, 노량진, 노원, 논현동, 당정동, 대치동, 대화동, 도곡동, 도봉, 도봉동, 동대문, 동작, 마곡, 마포, 매탄동, 면목동, 명동, 목동, 문발동, 문정동, 미사동, 미아동, 반포동, 방배동, 봉천동, 불광동, 비전동, 사당동, 사우동, 삼성동, 삼송동, 상동, 상봉동, 상암동, 서대문, 서초, 서초동, 서현동, 성내동, 성동, 성북, 성북동, 성수동, 송파, 수내동, 수유동, 신갈동, 신도림, 신림동, 신사동, 신정동, 신천동, 신촌, 압구정, 야탑동, 양천, 여의도, 역삼동, 연남동, 연신내, 영등포, 영등포동, 오전동, 오정동, 왕십리, 용산, 은평, 을지로, 이매동, 이태원, 인계동, 인창동, 잠실, 잠원동, 장항동, 정자동, 종로, 중계동, 중구, 중랑, 중리동, 창동, 천호동, 청담동, 청량리, 태전동, 평촌동, 포일동, 풍산동, 합정동, 향동, 홍대, 홍제동, 화곡동, 화정동, 회기동 등 서울 전 지역</p>
+    </div>
+    <div class="area-group">
+      <h4>경기도</h4>
+      <p>검단, 경안동, 고양, 고잔동, 과천, 광교, 광명, 광주, 교하동, 구리, 군포, 금정동, 금촌동, 기흥, 김포, 남양주, 다산동, 단원구, 동백, 동안구, 동탄, 동탄2, 만안구, 반월공단, 배곧, 별내동, 병점, 보정동, 봉담, 부발읍, 부천, 분당, 산본동, 상록구, 성남, 세교동, 소하동, 송도, 송탄, 수원, 수정구, 수지, 시화공단, 시흥, 시흥동, 안산, 안양, 안중, 영통, 오산, 오산동, 오포읍, 용인, 운정, 위례, 의왕, 이천, 일산동구, 일산서구, 일직동, 장기동, 정왕동, 중동, 중원구, 처인, 철산동, 청라, 킨텍스, 파주, 판교, 평내동, 평택, 풍무동, 하남, 하안동, 향남, 화성 등 경기 전 지역</p>
+    </div>
+    <div class="area-group">
+      <h4>인천광역시</h4>
+      <p>계산동, 구월동, 남동공단, 동인천, 부평공단, 부평역, 인천계양구, 인천남동구, 인천동구, 인천미추홀구, 인천부평구, 인천서구, 인천연수구, 인천중구, 주안동 등 인천 전 지역</p>
+    </div>
+  </div>
+</section>
 
 <footer>
   <div class="wrap">
