@@ -363,6 +363,16 @@ exports.handler = async (event) => {
       // 디버그/탐색용: 임의의 PUT 요청을 보냅니다 (지역 타겟팅 필드명을 확인하기 위함).
       //   ?action=raw-put&path=/ncc/adgroups/grp-...&fields=region
       //   POST body: 실제로 보낼 JSON
+      case "raw-post": {
+        if (!q.path) return json(400, { error: "path 파라미터가 필요합니다" });
+        try {
+          const result = await request("POST", q.path, parsedBody || {});
+          return json(200, result);
+        } catch (e) {
+          return json(200, { error: String(e.message || e) });
+        }
+      }
+
       case "raw-put": {
         if (!q.path) return json(400, { error: "path 파라미터가 필요합니다" });
         const fieldsQ = q.fields ? `?fields=${encodeURIComponent(q.fields)}` : "";
