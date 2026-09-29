@@ -155,6 +155,15 @@ exports.handler = async (event) => {
         return json(200, result);
       }
 
+      // 광고(소재)를 완전히 삭제합니다 - 광고그룹당 광고는 최대 3개까지만 만들 수 있어서,
+      // 오래된 정지(paused) 광고를 지워야 새 광고를 만들 자리가 생기는 경우에 사용합니다.
+      // ?action=delete-ad&adId=nad-...
+      case "delete-ad": {
+        if (!q.adId) return json(400, { error: "adId 파라미터가 필요합니다" });
+        const result = await request("DELETE", `/ncc/ads/${encodeURIComponent(q.adId)}`);
+        return json(200, result || { deleted: q.adId });
+      }
+
       case "estimate": {
         if (!q.keyword || !q.position) {
           return json(400, { error: "keyword, position 파라미터가 필요합니다" });
@@ -545,6 +554,9 @@ exports.handler = async (event) => {
             "create-ad-extensions",
             "pause-ad-extension",
             "set-campaign-lock",
+            "create-ad",
+            "pause-ad",
+            "delete-ad",
           ],
         });
     }
