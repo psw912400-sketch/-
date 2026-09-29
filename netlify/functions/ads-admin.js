@@ -190,6 +190,7 @@ exports.handler = async (event) => {
         const body = parsedBody.items.map((it) => ({
           keyword: it.keyword,
           bidAmt: it.bidAmt != null ? it.bidAmt : 70,
+          useGroupBidAmt: false,
         }));
         const result = await request(
           "POST",
