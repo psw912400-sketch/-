@@ -176,6 +176,29 @@ exports.handler = async (event) => {
         return json(200, result);
       }
 
+      // 새 키워드를 한 광고그룹에 최대 100개까지 한 번에 등록합니다.
+      //   POST ?action=create-keywords&adgroupId=grp-...
+      //   body: {"items":[{"keyword":"...","bidAmt":70}, ...]}
+      case "create-keywords": {
+        if (!q.adgroupId) return json(400, { error: "adgroupId 파라미터가 필요합니다" });
+        if (!parsedBody || !Array.isArray(parsedBody.items) || !parsedBody.items.length) {
+          return json(400, { error: "POST 본문에 비어있지 않은 items 배열이 필요합니다" });
+        }
+        if (parsedBody.items.length > 100) {
+          return json(400, { error: "한 번에 최대 100개까지만 가능합니다" });
+        }
+        const body = parsedBody.items.map((it) => ({
+          keyword: it.keyword,
+          bidAmt: it.bidAmt != null ? it.bidAmt : 70,
+        }));
+        const result = await request(
+          "POST",
+          `/ncc/keywords?nccAdgroupId=${encodeURIComponent(q.adgroupId)}`,
+          body
+        );
+        return json(200, result);
+      }
+
       case "estimate": {
         if (!q.keyword || !q.position) {
           return json(400, { error: "keyword, position 파라미터가 필요합니다" });
@@ -570,6 +593,7 @@ exports.handler = async (event) => {
             "pause-ad",
             "delete-ad",
             "keyword-volume",
+            "create-keywords",
           ],
         });
     }
