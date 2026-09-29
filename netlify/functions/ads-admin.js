@@ -164,6 +164,18 @@ exports.handler = async (event) => {
         return json(200, result || { deleted: q.adId });
       }
 
+      // 키워드도구: 힌트 키워드의 연관 키워드와 월간 검색수(PC/모바일)·경쟁정도를 조회합니다.
+      // 광고 등록 여부와 무관하게 조회 가능 - 신규 키워드 수요 확인용.
+      // ?action=keyword-volume&hintKeywords=FCU분해세척,FCU에어컨분해청소  (콤마 구분, 최대 5개, 공백 없이 권장)
+      case "keyword-volume": {
+        if (!q.hintKeywords) return json(400, { error: "hintKeywords 파라미터가 필요합니다 (콤마로 구분, 최대 5개)" });
+        const result = await request(
+          "GET",
+          `/keywordstool?hintKeywords=${encodeURIComponent(q.hintKeywords)}&showDetail=1`
+        );
+        return json(200, result);
+      }
+
       case "estimate": {
         if (!q.keyword || !q.position) {
           return json(400, { error: "keyword, position 파라미터가 필요합니다" });
@@ -557,6 +569,7 @@ exports.handler = async (event) => {
             "create-ad",
             "pause-ad",
             "delete-ad",
+            "keyword-volume",
           ],
         });
     }
