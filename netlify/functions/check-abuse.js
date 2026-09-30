@@ -1,4 +1,4 @@
-// 1시간마다 자동 실행됩니다 (netlify.toml의 schedule 설정).
+// 2시간마다 자동 실행됩니다 (netlify.toml의 schedule 설정).
 // 최근 방문 로그를 분석해서 "짧은 시간에 반복 방문하는 IP"를 찾아 flagged.json에 기록합니다.
 //
 // [다음 단계 - 네이버 API 키 발급 후 진행]
@@ -11,7 +11,15 @@ const { registerExcludedIp } = require("./lib/naver-api");
 
 const WINDOW_MS = 3 * 60 * 60 * 1000; // 최근 3시간
 const THRESHOLD = 5; // 3시간 내 5회 이상이면 의심
-const RETENTION_MS = 7 * 24 * 60 * 60 * 1000; // 7일 지난 로그는 삭제
+const RETENTION_MS = 3 * 24 * 60 * 60 * 1000; // 3일 지난 로그는 삭제 (비용 절감: 기존 7일)
+const READ_BATCH = 25; // 동시에 읽는 로그 수 (순차 읽기보다 실행 시간이 훨씬 짧아 크레딧 절약)
+
+// 로그 키는 "visits/<밀리초시각>-<랜덤>.json" 형태라서, 파일을 열어보지 않고
+// 키 이름만으로 시각을 알 수 있습니다. 오래된 로그는 읽지 않고 바로 삭제만 합니다.
+function keyTimestamp(key) {
+  const m = key.match(/^visits\/(\d{13})-/);
+  return m ? Number(m[1]) : null;
+}
 
 exports.handler = async () => {
   const store = getBlobStore("click-logs");
@@ -20,23 +28,30 @@ exports.handler = async () => {
 
   const counts = {}; // ip -> [timestamps]
   const toDelete = [];
+  const toRead = [];
 
   for (const b of blobs) {
-    const record = await store.get(b.key, { type: "json" });
-    if (!record) continue;
+    const ts = keyTimestamp(b.key);
+    if (ts === null) continue;
+    if (now - ts > RETENTION_MS) toDelete.push(b.key);
+    else if (now - ts <= WINDOW_MS) toRead.push(b.key); // 분석 대상은 최근 3시간분만 읽음
+  }
 
-    if (now - record.ts > RETENTION_MS) {
-      toDelete.push(b.key);
-      continue;
-    }
-    if (now - record.ts <= WINDOW_MS) {
+  for (let i = 0; i < toRead.length; i += READ_BATCH) {
+    const records = await Promise.all(
+      toRead.slice(i, i + READ_BATCH).map((k) => store.get(k, { type: "json" }))
+    );
+    for (const record of records) {
+      if (!record) continue;
       counts[record.ip] = counts[record.ip] || [];
       counts[record.ip].push(record.ts);
     }
   }
 
   // 오래된 로그 정리 (계속 쌓이지 않도록)
-  await Promise.all(toDelete.map((k) => store.delete(k)));
+  for (let i = 0; i < toDelete.length; i += READ_BATCH) {
+    await Promise.all(toDelete.slice(i, i + READ_BATCH).map((k) => store.delete(k)));
+  }
 
   const flagged = Object.entries(counts)
     .filter(([, ts]) => ts.length >= THRESHOLD)
@@ -78,6 +93,6 @@ exports.handler = async () => {
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ checked: blobs.length, newlyFlagged: flagged.length, submitted }),
+    body: JSON.stringify({ checked: toRead.length, newlyFlagged: flagged.length, submitted }),
   };
 };
