@@ -1,4 +1,4 @@
-// 광고 노출시간대(평일 한국시간 12·15·18시)에 자동 실행됩니다 (netlify.toml의 schedule 설정).
+// 광고 노출시간대(평일 한국시간 12·18시)에 자동 실행됩니다 (netlify.toml의 schedule 설정).
 // 최근 방문 로그를 분석해서 "짧은 시간에 반복 방문하는 IP"를 찾아 flagged.json에 기록합니다.
 //
 // [다음 단계 - 네이버 API 키 발급 후 진행]
@@ -9,7 +9,8 @@
 const { getBlobStore } = require("./lib/blob-store");
 const { registerExcludedIp } = require("./lib/naver-api");
 
-const WINDOW_MS = 3 * 60 * 60 * 1000; // 최근 3시간
+const WINDOW_MS = 3 * 60 * 60 * 1000; // 의심 판단 기준 구간: 3시간
+const SCAN_MS = 6 * 60 * 60 * 1000; // 실행 간격이 길어서(12시·18시) 최근 6시간 로그를 읽고, 그 안의 모든 3시간 구간을 검사
 const THRESHOLD = 5; // 3시간 내 5회 이상이면 의심
 const RETENTION_MS = 3 * 24 * 60 * 60 * 1000; // 3일 지난 로그는 삭제 (비용 절감: 기존 7일)
 const READ_BATCH = 25; // 동시에 읽는 로그 수 (순차 읽기보다 실행 시간이 훨씬 짧아 크레딧 절약)
@@ -34,7 +35,7 @@ exports.handler = async () => {
     const ts = keyTimestamp(b.key);
     if (ts === null) continue;
     if (now - ts > RETENTION_MS) toDelete.push(b.key);
-    else if (now - ts <= WINDOW_MS) toRead.push(b.key); // 분석 대상은 최근 3시간분만 읽음
+    else if (now - ts <= SCAN_MS) toRead.push(b.key); // 분석 대상은 최근 6시간분만 읽음
   }
 
   // 최근 3시간 방문이 임계값(5회)보다 적으면 어떤 IP도 의심될 수 없으므로 로그를 읽지 않습니다.
@@ -55,9 +56,18 @@ exports.handler = async () => {
     await Promise.all(toDelete.slice(i, i + READ_BATCH).map((k) => store.delete(k)));
   }
 
-  const flagged = Object.entries(counts)
-    .filter(([, ts]) => ts.length >= THRESHOLD)
-    .map(([ip, ts]) => ({ ip, count: ts.length, lastSeen: Math.max(...ts) }));
+  // IP별로 시각순 정렬 후, 어떤 3시간 구간에서든 THRESHOLD회 이상이면 의심으로 봅니다.
+  const flagged = [];
+  for (const [ip, arr] of Object.entries(counts)) {
+    const ts = arr.slice().sort((a, b) => a - b);
+    let lo = 0;
+    let best = 0;
+    for (let hi = 0; hi < ts.length; hi++) {
+      while (ts[hi] - ts[lo] > WINDOW_MS) lo++;
+      best = Math.max(best, hi - lo + 1);
+    }
+    if (best >= THRESHOLD) flagged.push({ ip, count: best, lastSeen: ts[ts.length - 1] });
+  }
 
   // 새로 의심된 IP가 없으면 저장소를 더 읽거나 쓰지 않고 바로 끝냅니다 (크레딧 절약).
   if (flagged.length === 0) {
