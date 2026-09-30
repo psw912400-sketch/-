@@ -1,4 +1,4 @@
-// 2시간마다 자동 실행됩니다 (netlify.toml의 schedule 설정).
+// 3시간마다 자동 실행됩니다 (netlify.toml의 schedule 설정).
 // 최근 방문 로그를 분석해서 "짧은 시간에 반복 방문하는 IP"를 찾아 flagged.json에 기록합니다.
 //
 // [다음 단계 - 네이버 API 키 발급 후 진행]
@@ -37,7 +37,9 @@ exports.handler = async () => {
     else if (now - ts <= WINDOW_MS) toRead.push(b.key); // 분석 대상은 최근 3시간분만 읽음
   }
 
-  for (let i = 0; i < toRead.length; i += READ_BATCH) {
+  // 최근 3시간 방문이 임계값(5회)보다 적으면 어떤 IP도 의심될 수 없으므로 로그를 읽지 않습니다.
+  const canFlag = toRead.length >= THRESHOLD;
+  for (let i = 0; canFlag && i < toRead.length; i += READ_BATCH) {
     const records = await Promise.all(
       toRead.slice(i, i + READ_BATCH).map((k) => store.get(k, { type: "json" }))
     );
@@ -56,6 +58,11 @@ exports.handler = async () => {
   const flagged = Object.entries(counts)
     .filter(([, ts]) => ts.length >= THRESHOLD)
     .map(([ip, ts]) => ({ ip, count: ts.length, lastSeen: Math.max(...ts) }));
+
+  // 새로 의심된 IP가 없으면 저장소를 더 읽거나 쓰지 않고 바로 끝냅니다 (크레딧 절약).
+  if (flagged.length === 0) {
+    return { statusCode: 200, body: JSON.stringify({ checked: toRead.length, newlyFlagged: 0, submitted: 0 }) };
+  }
 
   const flagStore = getBlobStore("abuse-flags");
   const existing = (await flagStore.get("flagged.json", { type: "json" })) || [];
