@@ -1,0 +1,28 @@
+name: Blog draft
+
+on:
+  schedule:
+    - cron: "0 0 * * 1,4" # 월·목 09:00 KST
+  workflow_dispatch:
+    inputs:
+      topic_index:
+        description: "topics.json 주제 번호(0부터, 비우면 자동 순환)"
+        required: false
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Generate draft issue
+        run: node blog-automation/generate.mjs ${{ github.event.inputs.topic_index }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
